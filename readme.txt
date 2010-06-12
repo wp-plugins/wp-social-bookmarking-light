@@ -39,9 +39,6 @@ This is the list of used social sites:
 
 == Screenshots ==
 
-1. Social bookmark icons
-2. Social Bookmarking JP control panel
-
 == Changelog ==
 
 = 1.0 =
