@@ -39,6 +39,9 @@ This is the list of used social sites:
 
 == Screenshots ==
 
+1. This is how the plugin looks in your blog.
+2. This is how the plugin looks in settings.
+
 == Changelog ==
 
 = 1.0 =
