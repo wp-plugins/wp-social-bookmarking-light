@@ -44,6 +44,10 @@ This is the list of used social sites:
 
 == Changelog ==
 
+= 1.0.1 =
+
+* Fix for img style.
+
 = 1.0.0 =
 
 * First Release

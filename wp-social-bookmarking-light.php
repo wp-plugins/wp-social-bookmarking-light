@@ -5,7 +5,7 @@ Plugin URI: http://www.ninxit.com/blog/
 Description: This plugin inserts social share links at the top or bottom of each post.
 Author: utah
 Author URI: http://www.ninxit.com/blog/
-Version: 1.0.0
+Version: 1.0.1
 */
 /*
 Copyright 2010 utah (email : labs.ninxit@gmail.com)
@@ -324,6 +324,7 @@ function wp_social_bookmarking_light_wp_head()
 <style>
 ul.wp_social_bookmarking_light{list-style:none;border:0;padding:0;margin:0;}
 ul.wp_social_bookmarking_light li{float:left;border:0;padding:0 4px 0 0;margin:0;height:17px;}
+ul.wp_social_bookmarking_light img{border:0;padding:0;margin:0;}
 wp_social_bookmarking_light_clear{clear:both;}
 </style>
 <?php
