@@ -1,5 +1,5 @@
 === WP Social Bookmarking Light ===
-Contributors: utah
+Contributors: utahvich
 Donate link: http://www.ninxit.com/blog/
 Tags: links, social, bookmarks, bookmarking, Hatena, Livedoor Clip, BuzzURL, @nifty clip, Twitter, Tumblr, FC2 Bookmark, newsing, Choix, Yahoo!JAPAN Bookmark, Google Bookmark, Delicious, Digg, FriendFeed, Google Buzz, Facebook
 Requires at least: 2.9.0
