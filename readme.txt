@@ -3,8 +3,8 @@ Contributors: utahvich
 Donate link: http://www.ninxit.com/blog/
 Tags: links, social, bookmarks, bookmarking, Hatena, Livedoor Clip, BuzzURL, @nifty clip, Twitter, Tumblr, FC2 Bookmark, newsing, Choix, Yahoo!JAPAN Bookmark, Google Bookmark, Delicious, Digg, FriendFeed, Google Buzz, Facebook
 Requires at least: 2.9.0
-Tested up to: 2.9.0
-Stable tag: 1.0.0
+Tested up to: 2.9.2
+Stable tag: 1.0.1
 
 This plugin inserts social share links at the top or bottom of each post.
 
