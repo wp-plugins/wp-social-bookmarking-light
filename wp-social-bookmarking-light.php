@@ -5,7 +5,7 @@ Plugin URI: http://www.ninxit.com/blog/
 Description: This plugin inserts social share links at the top or bottom of each post.
 Author: utah
 Author URI: http://www.ninxit.com/blog/
-Version: 1.0
+Version: 1.0.0
 */
 /*
 Copyright 2010 utah (email : labs.ninxit@gmail.com)
