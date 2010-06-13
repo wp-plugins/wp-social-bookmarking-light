@@ -35,7 +35,7 @@ This is the list of used social sites:
 
 1. Upload this directory to the 'wp-content/plugins/' directory
 2. Activate the plugin through the 'Plugins' menu in WordPress
-3. Open 'WP Social Bookmarking Light' control panel through the 'Settings' menu and change configurations (This step is not required, the plugin has default settings)
+3. Open 'WP Social Bookmarking Light Options' control panel through the 'Settings' menu and change configurations (This step is not required, the plugin has default settings)
 
 == Screenshots ==
 
