@@ -4,7 +4,7 @@ Donate link: http://www.ninxit.com/blog/
 Tags: links, social, bookmarks, bookmarking, Hatena, Livedoor Clip, BuzzURL, @nifty clip, Twitter, Tumblr, FC2 Bookmark, newsing, Choix, Yahoo!JAPAN Bookmark, Google Bookmark, Delicious, Digg, FriendFeed, Google Buzz, Facebook
 Requires at least: 2.9.0
 Tested up to: 2.9.2
-Stable tag: 1.0.1
+Stable tag: 1.1.0
 
 This plugin inserts social share links at the top or bottom of each post.
 
@@ -41,8 +41,14 @@ This is the list of used social sites:
 
 1. This is how the plugin looks in your blog.
 2. This is how the plugin looks in settings.
+3. This is how the plugin looks in manually inside your template.
 
 == Changelog ==
+
+= 1.1.0 =
+
+* Fix for li style.
+* Add wp_social_bookmarking_light_output_e function. It can position the social-links manually inside your template.
 
 = 1.0.1 =
 
