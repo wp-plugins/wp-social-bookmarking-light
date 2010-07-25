@@ -3,12 +3,12 @@
 Plugin Name: WP Social Bookmarking Light
 Plugin URI: http://www.ninxit.com/blog/
 Description: This plugin inserts social share links at the top or bottom of each post.
-Author: utah
+Author: utahta
 Author URI: http://www.ninxit.com/blog/
 Version: 1.0.1
 */
 /*
-Copyright 2010 utah (email : labs.ninxit@gmail.com)
+Copyright 2010 utahta (email : labs.ninxit@gmail.com)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
