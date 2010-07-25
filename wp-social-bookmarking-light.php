@@ -1,14 +1,14 @@
 <?php
 /*
 Plugin Name: WP Social Bookmarking Light
-Plugin URI: http://www.ninxit.com/blog/
+Plugin URI: http://www.ninxit.com/blog/2010/06/13/wp-social-bookmarking-light/
 Description: This plugin inserts social share links at the top or bottom of each post.
-Author: utah
+Author: utahta
 Author URI: http://www.ninxit.com/blog/
-Version: 1.0.1
+Version: 1.1.0
 */
 /*
-Copyright 2010 utah (email : labs.ninxit@gmail.com)
+Copyright 2010 utahta (email : labs.ninxit@gmail.com)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -322,10 +322,11 @@ function wp_social_bookmarking_light_wp_head()
 {
 ?>
 <style>
-ul.wp_social_bookmarking_light{list-style:none;border:0;padding:0;margin:0;}
-ul.wp_social_bookmarking_light li{float:left;border:0;padding:0 4px 0 0;margin:0;height:17px;}
-ul.wp_social_bookmarking_light img{border:0;padding:0;margin:0;}
-wp_social_bookmarking_light_clear{clear:both;}
+ul.wp_social_bookmarking_light{list-style:none !important;border:0 !important;padding:0;margin:0;}
+ul.wp_social_bookmarking_light li{float:left !important;border:0 !important;padding:0 4px 0 0 !important;margin:0 !important;height:17px !important;text-indent:0 !important;}
+ul.wp_social_bookmarking_light li:before{content:"" !important;}
+ul.wp_social_bookmarking_light img{border:0 !important;padding:0;margin:0;}
+wp_social_bookmarking_light_clear{clear:both !important;}
 </style>
 <?php
 }
@@ -341,6 +342,26 @@ function wp_social_bookmarking_light_admin_menu()
     }
 }
 
+function wp_social_bookmarking_light_output( $services )
+{
+    $wp = new WpSocialBookmarkingLight( get_permalink(), get_the_title(), get_bloginfo('name') );
+
+    $out = '';
+    foreach( explode(",", $services) as $service ){
+        $service = trim($service);
+        $out .= call_user_func( array( $wp, $service ) ); // call WpSocialBookmarkingLight method
+    }
+    if( $out == '' ){
+        return $out;
+    }
+    return "<ul class='wp_social_bookmarking_light'>{$out}</ul><br class='wp_social_bookmarking_light_clear' />";
+}
+
+function wp_social_bookmarking_light_output_e( $services )
+{
+	echo wp_social_bookmarking_light_output( $services );
+}
+
 function wp_social_bookmarking_light_the_content( $content )
 {
     if( is_feed() || is_404() || is_robots() || is_comments_popup() || (function_exists( 'is_ktai' ) && is_ktai()) ){
@@ -351,23 +372,16 @@ function wp_social_bookmarking_light_the_content( $content )
     if( $options['single_page'] && !is_singular() ){
         return $content;
     }
-    
-    $wp = new WpSocialBookmarkingLight( get_permalink(), get_the_title(), get_bloginfo('name') );
 
-    $out = '';
-    foreach( explode(",", $options['services']) as $service ){
-        $service = trim($service);
-        $out .= call_user_func( array( $wp, $service ) ); // call WpSocialBookmarkingLight method
-    }
-    
+    $out = wp_social_bookmarking_light_output( $options['services'] );
     if( $out == '' ){
        return $content;
     }
     if( $options['position'] == 'top' ){
-        return "<ul class='wp_social_bookmarking_light'>{$out}</ul><br class='wp_social_bookmarking_light_clear' />{$content}";
+        return "{$out}{$content}";
     }
     else if( $options['position'] == 'bottom' ){
-        return "{$content}<ul class='wp_social_bookmarking_light'>{$out}</ul><br class='wp_social_bookmarking_light_clear' />";
+        return "{$content}{$out}";
     }
     return $content;
 }
