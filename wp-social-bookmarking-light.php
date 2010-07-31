@@ -5,7 +5,7 @@ Plugin URI: http://www.ninxit.com/blog/2010/06/13/wp-social-bookmarking-light/
 Description: This plugin inserts social share links at the top or bottom of each post.
 Author: utahta
 Author URI: http://www.ninxit.com/blog/
-Version: 1.1.0
+Version: 1.2.0
 */
 /*
 Copyright 2010 utahta (email : labs.ninxit@gmail.com)
@@ -310,7 +310,8 @@ function wp_social_bookmarking_light_default_options()
 {
     return array( "services" => "hatena, hatena_users, facebook, google_buzz, yahoo, livedoor, friendfeed, tweetmeme",
                   "position" => "top",
-                  "single_page" => true );
+                  "single_page" => true,
+                  "is_page" => true );
 }
 
 function wp_social_bookmarking_light_options()
@@ -372,6 +373,9 @@ function wp_social_bookmarking_light_the_content( $content )
     if( $options['single_page'] && !is_singular() ){
         return $content;
     }
+    if( !$options['is_page'] && is_page() ){
+    	return $content;
+    }
 
     $out = wp_social_bookmarking_light_output( $options['services'] );
     if( $out == '' ){
@@ -400,7 +404,8 @@ function wp_social_bookmarking_light_options_page()
     if( isset( $_POST['save'] ) ){
         $options = array( "services" => $_POST["services"],
                           "position" => $_POST["position"],
-                          "single_page" => $_POST["single_page"] == 'true' );
+                          "single_page" => $_POST["single_page"] == 'true',
+                          "is_page" => $_POST["is_page"] == 'true' );
         update_option( 'wp_social_bookmarking_light_options', $options );
         echo '<div class="updated"><p><strong>'.__( 'Options saved.', WP_SOCIAL_BOOKMARKING_LIGHT_DOMAIN ).'</strong></p></div>';
     }
@@ -450,11 +455,20 @@ function wp_social_bookmarking_light_options_page()
     </td>
     </tr>
     <tr>
-    <th scope="row">Single Page:</th>
+    <th scope="row">Is Singular:</th>
     <td>
     <select name='single_page'>
-    <option value='true' <?php if( $options['single_page'] == true ) echo 'selected'; ?>>True</option>
-    <option value='false' <?php if( $options['single_page'] == false ) echo 'selected'; ?>>False</option>
+    <option value='true' <?php if( $options['single_page'] == true ) echo 'selected'; ?>>Enabled</option>
+    <option value='false' <?php if( $options['single_page'] == false ) echo 'selected'; ?>>Disabled</option>
+    </select>
+    </td>
+    </tr>
+    <tr>
+    <th scope="row">Is Page:</th>
+    <td>
+    <select name='is_page'>
+    <option value='true' <?php if( $options['is_page'] == true ) echo 'selected'; ?>>Enabled</option>
+    <option value='false' <?php if( $options['is_page'] == false ) echo 'selected'; ?>>Disabled</option>
     </select>
     </td>
     </tr>
