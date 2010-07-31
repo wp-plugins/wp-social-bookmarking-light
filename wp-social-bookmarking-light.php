@@ -1,14 +1,14 @@
 <?php
 /*
 Plugin Name: WP Social Bookmarking Light
-Plugin URI: http://www.ninxit.com/blog/
+Plugin URI: http://www.ninxit.com/blog/2010/06/13/wp-social-bookmarking-light/
 Description: This plugin inserts social share links at the top or bottom of each post.
-Author: utah
+Author: utahta
 Author URI: http://www.ninxit.com/blog/
-Version: 1.0.1
+Version: 1.2.0
 */
 /*
-Copyright 2010 utah (email : labs.ninxit@gmail.com)
+Copyright 2010 utahta (email : labs.ninxit@gmail.com)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -310,7 +310,8 @@ function wp_social_bookmarking_light_default_options()
 {
     return array( "services" => "hatena, hatena_users, facebook, google_buzz, yahoo, livedoor, friendfeed, tweetmeme",
                   "position" => "top",
-                  "single_page" => true );
+                  "single_page" => true,
+                  "is_page" => true );
 }
 
 function wp_social_bookmarking_light_options()
@@ -322,10 +323,11 @@ function wp_social_bookmarking_light_wp_head()
 {
 ?>
 <style>
-ul.wp_social_bookmarking_light{list-style:none;border:0;padding:0;margin:0;}
-ul.wp_social_bookmarking_light li{float:left;border:0;padding:0 4px 0 0;margin:0;height:17px;}
-ul.wp_social_bookmarking_light img{border:0;padding:0;margin:0;}
-wp_social_bookmarking_light_clear{clear:both;}
+ul.wp_social_bookmarking_light{list-style:none !important;border:0 !important;padding:0;margin:0;}
+ul.wp_social_bookmarking_light li{float:left !important;border:0 !important;padding:0 4px 0 0 !important;margin:0 !important;height:17px !important;text-indent:0 !important;}
+ul.wp_social_bookmarking_light li:before{content:"" !important;}
+ul.wp_social_bookmarking_light img{border:0 !important;padding:0;margin:0;}
+wp_social_bookmarking_light_clear{clear:both !important;}
 </style>
 <?php
 }
@@ -341,6 +343,26 @@ function wp_social_bookmarking_light_admin_menu()
     }
 }
 
+function wp_social_bookmarking_light_output( $services )
+{
+    $wp = new WpSocialBookmarkingLight( get_permalink(), get_the_title(), get_bloginfo('name') );
+
+    $out = '';
+    foreach( explode(",", $services) as $service ){
+        $service = trim($service);
+        $out .= call_user_func( array( $wp, $service ) ); // call WpSocialBookmarkingLight method
+    }
+    if( $out == '' ){
+        return $out;
+    }
+    return "<ul class='wp_social_bookmarking_light'>{$out}</ul><br class='wp_social_bookmarking_light_clear' />";
+}
+
+function wp_social_bookmarking_light_output_e( $services )
+{
+	echo wp_social_bookmarking_light_output( $services );
+}
+
 function wp_social_bookmarking_light_the_content( $content )
 {
     if( is_feed() || is_404() || is_robots() || is_comments_popup() || (function_exists( 'is_ktai' ) && is_ktai()) ){
@@ -351,23 +373,19 @@ function wp_social_bookmarking_light_the_content( $content )
     if( $options['single_page'] && !is_singular() ){
         return $content;
     }
-    
-    $wp = new WpSocialBookmarkingLight( get_permalink(), get_the_title(), get_bloginfo('name') );
-
-    $out = '';
-    foreach( explode(",", $options['services']) as $service ){
-        $service = trim($service);
-        $out .= call_user_func( array( $wp, $service ) ); // call WpSocialBookmarkingLight method
+    if( !$options['is_page'] && is_page() ){
+    	return $content;
     }
-    
+
+    $out = wp_social_bookmarking_light_output( $options['services'] );
     if( $out == '' ){
        return $content;
     }
     if( $options['position'] == 'top' ){
-        return "<ul class='wp_social_bookmarking_light'>{$out}</ul><br class='wp_social_bookmarking_light_clear' />{$content}";
+        return "{$out}{$content}";
     }
     else if( $options['position'] == 'bottom' ){
-        return "{$content}<ul class='wp_social_bookmarking_light'>{$out}</ul><br class='wp_social_bookmarking_light_clear' />";
+        return "{$content}{$out}";
     }
     return $content;
 }
@@ -386,7 +404,8 @@ function wp_social_bookmarking_light_options_page()
     if( isset( $_POST['save'] ) ){
         $options = array( "services" => $_POST["services"],
                           "position" => $_POST["position"],
-                          "single_page" => $_POST["single_page"] == 'true' );
+                          "single_page" => $_POST["single_page"] == 'true',
+                          "is_page" => $_POST["is_page"] == 'true' );
         update_option( 'wp_social_bookmarking_light_options', $options );
         echo '<div class="updated"><p><strong>'.__( 'Options saved.', WP_SOCIAL_BOOKMARKING_LIGHT_DOMAIN ).'</strong></p></div>';
     }
@@ -436,11 +455,20 @@ function wp_social_bookmarking_light_options_page()
     </td>
     </tr>
     <tr>
-    <th scope="row">Single Page:</th>
+    <th scope="row">Is Singular:</th>
     <td>
     <select name='single_page'>
-    <option value='true' <?php if( $options['single_page'] == true ) echo 'selected'; ?>>True</option>
-    <option value='false' <?php if( $options['single_page'] == false ) echo 'selected'; ?>>False</option>
+    <option value='true' <?php if( $options['single_page'] == true ) echo 'selected'; ?>>Enabled</option>
+    <option value='false' <?php if( $options['single_page'] == false ) echo 'selected'; ?>>Disabled</option>
+    </select>
+    </td>
+    </tr>
+    <tr>
+    <th scope="row">Is Page:</th>
+    <td>
+    <select name='is_page'>
+    <option value='true' <?php if( $options['is_page'] == true ) echo 'selected'; ?>>Enabled</option>
+    <option value='false' <?php if( $options['is_page'] == false ) echo 'selected'; ?>>Disabled</option>
     </select>
     </td>
     </tr>
