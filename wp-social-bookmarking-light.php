@@ -5,7 +5,7 @@ Plugin URI: http://www.ninxit.com/blog/2010/06/13/wp-social-bookmarking-light/
 Description: This plugin inserts social share links at the top or bottom of each post.
 Author: utahta
 Author URI: http://www.ninxit.com/blog/
-Version: 1.2.0
+Version: 1.3.0
 */
 /*
 Copyright 2010 utahta (email : labs.ninxit@gmail.com)
@@ -117,6 +117,15 @@ class WpSocialBookmarkingLight
                                ."</script>"
                                ."<script type='text/javascript' src='http://tweetmeme.com/i/scripts/button.js'></script>" );
     }
+    
+    /**
+     * @brief twitter
+     */
+    function twitter()
+    {
+        return $this->link_raw( '<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal">Tweet</a>'
+        						.'<script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>' );
+    }
 
     /**
      * @brief Livedoor Clip
@@ -149,6 +158,17 @@ class WpSocialBookmarkingLight
     function yahoo_users()
     {
         return $this->link_raw( "<script src='http://num.bookmarks.yahoo.co.jp/numimage.js?disptype=small'></script>" );
+    }
+    
+    /**
+     * @brief Yahoo Buzz
+     */
+    function yahoo_buzz()
+    {
+        $url = "http://buzz.yahoo.com/buzz?targetUrl={$this->encode_url}&headline={$this->encode_title}";
+        $alt = __( "Buzz This", WP_SOCIAL_BOOKMARKING_LIGHT_DOMAIN );
+        $icon = WP_SOCIAL_BOOKMARKING_LIGHT_IMAGES_URL."/yahoo_buzz.png";
+        return $this->link( $url, $alt, $icon, 16, 16 );
     }
     
     /**
@@ -298,9 +318,31 @@ class WpSocialBookmarkingLight
      */
     function facebook()
     {
-        $url = "http://www.facebook.com/share.php?u={$this->encode_url}";
+        $url = "http://www.facebook.com/share.php?u={$this->encode_url}&t={$this->encode_title}";
         $alt = __( "Share on Facebook", WP_SOCIAL_BOOKMARKING_LIGHT_DOMAIN );
         $icon = WP_SOCIAL_BOOKMARKING_LIGHT_IMAGES_URL."/facebook.png";
+    	return $this->link( $url, $alt, $icon, 16, 16 );
+    }
+    
+   	/**
+   	 * @brief reddit
+   	 */
+    function reddit()
+    {
+        $url = "http://www.reddit.com/submit?url={$this->encode_url}&title={$this->encode_title}";
+        $alt = __( "Share on reddit", WP_SOCIAL_BOOKMARKING_LIGHT_DOMAIN );
+        $icon = WP_SOCIAL_BOOKMARKING_LIGHT_IMAGES_URL."/reddit.png";
+    	return $this->link( $url, $alt, $icon, 16, 16 );
+    }
+    
+    /**
+     * @brief LinkedIn
+     */
+    function linkedin()
+    {
+        $url = "http://www.linkedin.com/shareArticle?mini=true&url={$this->encode_url}&title={$this->encode_title}";
+        $alt = __( "Share on LinkedIn", WP_SOCIAL_BOOKMARKING_LIGHT_DOMAIN );
+        $icon = WP_SOCIAL_BOOKMARKING_LIGHT_IMAGES_URL."/linkedin.png";
     	return $this->link( $url, $alt, $icon, 16, 16 );
     }
     
@@ -490,10 +532,12 @@ function wp_social_bookmarking_light_options_page()
     <tr><td>twib</td><td>Twib - Twitter</td></tr>
     <tr><td>twib_users</td><td>Twib Users - Twitter</td></tr>
     <tr><td>tweetmeme</td><td>TweetMeme - Twitter</td></tr>
+    <tr><td>twitter</td><td>Tweet Button - Twitter</td></tr>
     <tr><td>livedoor</td><td>Livedoor Clip</td></tr>
     <tr><td>livedoor_users</td><td>Livedoor Clip Users</td></tr>
     <tr><td>yahoo</td><td>Yahoo!JAPAN Bookmark</td></tr>
     <tr><td>yahoo_users</td><td>Yahoo!JAPAN Bookmark Users</td></tr>
+    <tr><td>yahoo_buzz</td><td>Yahoo!Buzz</td></tr>
     <tr><td>buzzurl</td><td>BuzzURL</td></tr>
     <tr><td>buzzurl_users</td><td>BuzzURL Users</td></tr>
     <tr><td>nifty</td><td>@nifty Clip</td></tr>
@@ -509,6 +553,8 @@ function wp_social_bookmarking_light_options_page()
     <tr><td>digg</td><td>Digg</td></tr>
     <tr><td>friendfeed</td><td>FriendFeed</td></tr>
     <tr><td>facebook</td><td>Facebook Share</td></tr>
+    <tr><td>reddit</td><td>reddit</td></tr>
+    <tr><td>linkedin</td><td>LinkedIn</td></tr>
     </table>
 </div>
 <?php
