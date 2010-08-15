@@ -1,10 +1,10 @@
 === WP Social Bookmarking Light ===
 Contributors: utahvich
 Donate link: http://www.ninxit.com/blog/
-Tags: links, social, bookmarks, bookmarking, Hatena, Livedoor Clip, BuzzURL, @nifty clip, Twitter, Tumblr, FC2 Bookmark, newsing, Choix, Yahoo!JAPAN Bookmark, Google Bookmark, Delicious, Digg, FriendFeed, Google Buzz, Facebook
+Tags: links, social, bookmarks, bookmarking, Hatena, Livedoor Clip, BuzzURL, @nifty clip, Twitter, Tumblr, FC2 Bookmark, newsing, Choix, Yahoo!JAPAN Bookmark, Yahoo!Buzz, Google Bookmark, Delicious, Digg, FriendFeed, Google Buzz, Facebook, reddit, LinkedIn
 Requires at least: 2.9.0
 Tested up to: 2.9.2
-Stable tag: 1.2.0
+Stable tag: 1.3.0
 
 This plugin inserts social share links at the top or bottom of each post.
 
@@ -25,11 +25,14 @@ This is the list of used social sites:
 *  newsing
 *  Choix
 *  Yahoo!JAPAN Bookmark
+*  Yahoo!Buzz
 *  Google Bookmark
 *  Google Buzz
 *  Delicious
 *  Digg
 *  FriendFeed
+*  reddit
+*  LinkedIn
 
 == Installation ==
 
@@ -44,6 +47,9 @@ This is the list of used social sites:
 3. This is how the plugin looks in manually inside your template.
 
 == Changelog ==
+
+= 1.3.0 =
+* Added Yahoo!Buzz, reddit, LinkedIn and TwitterButton. 
 
 = 1.2.0 =
 
