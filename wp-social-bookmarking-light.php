@@ -5,7 +5,7 @@ Plugin URI: http://www.ninxit.com/blog/2010/06/13/wp-social-bookmarking-light/
 Description: This plugin inserts social share links at the top or bottom of each post.
 Author: utahta
 Author URI: http://www.ninxit.com/blog/
-Version: 1.4.0
+Version: 1.4.1
 */
 /*
 Copyright 2010 utahta (email : labs.ninxit@gmail.com)
@@ -352,9 +352,9 @@ class WpSocialBookmarkingLight
     function evernote()
     {
 	  	$icon = WP_SOCIAL_BOOKMARKING_LIGHT_IMAGES_URL."/evernote.png";
-	  	$href = "javascript:(function(){EN_CLIP_HOST='http://www.evernote.com';try{var x=document.createElement('SCRIPT');x.type='text/javascript';x.src=EN_CLIP_HOST+'/public/bookmarkClipper.js?'+(new Date().getTime()/100000);document.getElementsByTagName('head')[0].appendChild(x);}catch(e){location.href=EN_CLIP_HOST+'/clip.action?url='+encodeURIComponent(location.href)+'&title='+encodeURIComponent(document.title);}})();";
-		return $this->link_raw( '<a href="'.$href.'" title="Clip to Evernote" <img src="'.$icon.'"></a>' );
-    }
+	  	$script = "(function(){EN_CLIP_HOST='http://www.evernote.com';try{var x=document.createElement('SCRIPT');x.type='text/javascript';x.src=EN_CLIP_HOST+'/public/bookmarkClipper.js?'+(new Date().getTime()/100000);document.getElementsByTagName('head')[0].appendChild(x);}catch(e){location.href=EN_CLIP_HOST+'/clip.action?url='+encodeURIComponent(location.href)+'&title='+encodeURIComponent(document.title);}})();";
+		return $this->link_raw( '<a href="#" title="Clip to Evernote" onclick="'.$script.'" <img src="'.$icon.'"></a>' );
+	}
     
     /**
      * @brief Instapaper

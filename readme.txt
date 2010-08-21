@@ -3,8 +3,8 @@ Contributors: utahvich
 Donate link: http://www.ninxit.com/blog/
 Tags: links, social, bookmarks, bookmarking, Hatena, Livedoor Clip, BuzzURL, @nifty clip, Twitter, Tumblr, FC2 Bookmark, newsing, Choix, Yahoo!JAPAN Bookmark, Yahoo!Buzz, Google Bookmark, Delicious, Digg, FriendFeed, Google Buzz, Facebook, reddit, LinkedIn, Evernote, Instapaper, StumbleUpon
 Requires at least: 2.9.0
-Tested up to: 2.9.2
-Stable tag: 1.4.0
+Tested up to: 3.0.1
+Stable tag: 1.4.1
 
 This plugin inserts social share links at the top or bottom of each post.
 
@@ -51,8 +51,11 @@ This is the list of used social sites:
 
 == Changelog ==
 
+= 1.4.1 =
+* Bug fix: some unable to clip to Evernote.
+
 = 1.4.0 =
-* Added Evernote, Instapaper and StumbleUpon
+* Added Evernote, Instapaper and StumbleUpon.
 
 = 1.3.0 =
 * Added Yahoo!Buzz, reddit, LinkedIn and TwitterButton. 
