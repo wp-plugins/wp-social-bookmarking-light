@@ -5,7 +5,7 @@ Plugin URI: http://www.ninxit.com/blog/2010/06/13/wp-social-bookmarking-light/
 Description: This plugin inserts social share links at the top or bottom of each post.
 Author: utahta
 Author URI: http://www.ninxit.com/blog/
-Version: 1.3.0
+Version: 1.4.0
 */
 /*
 Copyright 2010 utahta (email : labs.ninxit@gmail.com)
@@ -346,6 +346,36 @@ class WpSocialBookmarkingLight
     	return $this->link( $url, $alt, $icon, 16, 16 );
     }
     
+    /**
+     * @brief Evernote
+     */
+    function evernote()
+    {
+	  	$icon = WP_SOCIAL_BOOKMARKING_LIGHT_IMAGES_URL."/evernote.png";
+	  	$href = "javascript:(function(){EN_CLIP_HOST='http://www.evernote.com';try{var x=document.createElement('SCRIPT');x.type='text/javascript';x.src=EN_CLIP_HOST+'/public/bookmarkClipper.js?'+(new Date().getTime()/100000);document.getElementsByTagName('head')[0].appendChild(x);}catch(e){location.href=EN_CLIP_HOST+'/clip.action?url='+encodeURIComponent(location.href)+'&title='+encodeURIComponent(document.title);}})();";
+		return $this->link_raw( '<a href="'.$href.'" title="Clip to Evernote" <img src="'.$icon.'"></a>' );
+    }
+    
+    /**
+     * @brief Instapaper
+     */
+    function instapaper()
+    {
+	  	$href = "javascript:function iprl5(){var d=document,z=d.createElement(&#039;scr&#039;+&#039;ipt&#039;),b=d.body,l=d.location;try{if(!b)throw(0);d.title=&#039;(Saving...) &#039;+d.title;z.setAttribute(&#039;src&#039;,l.protocol+&#039;//www.instapaper.com/j/GKo8MDzHWjRx?u=&#039;+encodeURIComponent(l.href)+&#039;&amp;t=&#039;+(new Date().getTime()));b.appendChild(z);}catch(e){alert(&#039;Please wait until the page has loaded.&#039;);}}iprl5();void(0)";
+		return $this->link_raw( '<a href="'.$href.'" class="wp_social_bookmarking_light_instapaper" title="Read Later">Read Later</a>' );
+    }
+    
+    /**
+     * @brief StumbleUpon
+     */
+    function stumbleupon()
+    {
+        $url = "http://www.stumbleupon.com/submit?url={$this->encode_url}&title={$this->encode_title}";
+        $alt = __( "Share on StumbleUpon", WP_SOCIAL_BOOKMARKING_LIGHT_DOMAIN );
+        $icon = WP_SOCIAL_BOOKMARKING_LIGHT_IMAGES_URL."/stumbleupon.png";
+    	return $this->link( $url, $alt, $icon, 16, 16 );
+    }
+    
 }
 
 function wp_social_bookmarking_light_default_options()
@@ -369,7 +399,10 @@ ul.wp_social_bookmarking_light{list-style:none !important;border:0 !important;pa
 ul.wp_social_bookmarking_light li{float:left !important;border:0 !important;padding:0 4px 0 0 !important;margin:0 !important;height:17px !important;text-indent:0 !important;}
 ul.wp_social_bookmarking_light li:before{content:"" !important;}
 ul.wp_social_bookmarking_light img{border:0 !important;padding:0;margin:0;}
-wp_social_bookmarking_light_clear{clear:both !important;}
+.wp_social_bookmarking_light_clear{clear:both !important;}
+a.wp_social_bookmarking_light_instapaper {display: inline-block;font-family: 'Lucida Grande', Verdana, sans-serif;font-weight: bold;font-size: 11px;-webkit-border-radius: 8px;-moz-border-radius: 8px;color: #fff;background-color: #626262;border: 1px solid #626262;padding: 0px 3px 0px;text-shadow: #3b3b3b 1px 1px 0px;min-width: 62px;text-align: center;vertical-align: top;line-height:17px;}
+a.wp_social_bookmarking_light_instapaper, a.wp_social_bookmarking_light_instapaper:hover, a.wp_social_bookmarking_light_instapaper:active, a.wp_social_bookmarking_light_instapaper:visited {color: #fff; text-decoration: none; outline: none;}
+.wp_social_bookmarking_light_instapaper:focus {outline: none;}
 </style>
 <?php
 }
@@ -555,6 +588,9 @@ function wp_social_bookmarking_light_options_page()
     <tr><td>facebook</td><td>Facebook Share</td></tr>
     <tr><td>reddit</td><td>reddit</td></tr>
     <tr><td>linkedin</td><td>LinkedIn</td></tr>
+    <tr><td>evernote</td><td>Evernote</td></tr>
+    <tr><td>instapaper</td><td>Instapaper</td></tr>
+    <tr><td>stumbleupon</td><td>StumbleUpon</td></tr>
     </table>
 </div>
 <?php
