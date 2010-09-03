@@ -5,7 +5,7 @@ Plugin URI: http://www.ninxit.com/blog/2010/06/13/wp-social-bookmarking-light/
 Description: This plugin inserts social share links at the top or bottom of each post.
 Author: utahta
 Author URI: http://www.ninxit.com/blog/
-Version: 1.4.2
+Version: 1.4.3
 */
 /*
 Copyright 2010 utahta (email : labs.ninxit@gmail.com)
@@ -399,7 +399,7 @@ function wp_social_bookmarking_light_wp_head()
 ul.wp_social_bookmarking_light{list-style:none !important;border:0 !important;padding:0;margin:0;}
 ul.wp_social_bookmarking_light li{float:left !important;border:0 !important;padding:0 4px 0 0 !important;margin:0 !important;height:17px !important;text-indent:0 !important;}
 ul.wp_social_bookmarking_light li:before{content:"" !important;}
-ul.wp_social_bookmarking_light img{border:0 !important;padding:0;margin:0;}
+ul.wp_social_bookmarking_light img{border:0 !important;padding:0;margin:0;vertical-align:baseline !important;}
 .wp_social_bookmarking_light_clear{clear:both !important;}
 a.wp_social_bookmarking_light_instapaper {display: inline-block;font-family: 'Lucida Grande', Verdana, sans-serif;font-weight: bold;font-size: 11px;-webkit-border-radius: 8px;-moz-border-radius: 8px;color: #fff;background-color: #626262;border: 1px solid #626262;padding: 0px 3px 0px;text-shadow: #3b3b3b 1px 1px 0px;min-width: 62px;text-align: center;vertical-align: top;line-height:17px;}
 a.wp_social_bookmarking_light_instapaper, a.wp_social_bookmarking_light_instapaper:hover, a.wp_social_bookmarking_light_instapaper:active, a.wp_social_bookmarking_light_instapaper:visited {color: #fff; text-decoration: none; outline: none;}
