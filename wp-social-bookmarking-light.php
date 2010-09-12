@@ -5,7 +5,7 @@ Plugin URI: http://www.ninxit.com/blog/2010/06/13/wp-social-bookmarking-light/
 Description: This plugin inserts social share links at the top or bottom of each post.
 Author: utahta
 Author URI: http://www.ninxit.com/blog/
-Version: 1.4.3
+Version: 1.5.0
 */
 /*
 Copyright 2010 utahta (email : labs.ninxit@gmail.com)
@@ -377,6 +377,29 @@ class WpSocialBookmarkingLight
     	return $this->link( $url, $alt, $icon, 16, 16 );
     }
     
+    /**
+     * @brief mixi Check
+     */
+    function mixi()
+    {
+    	$options = wp_social_bookmarking_light_options();
+    	$data_key = $options['mixi_check_key'];
+    	
+    	return $this->link_raw( '<a href="http://mixi.jp/share.pl" class="mixi-check-button" data-button="button-3" data-key="'.$data_key.'">Check</a>'
+    						   .'<script type="text/javascript" src="http://static.mixi.jp/js/share.js"></script>' );
+    }
+    
+    /**
+     * @brief GREE Social Feedback
+     */
+    function gree()
+    {
+        $url = "http://gree.jp/?mode=share&act=write&url={$this->encode_url}&title={$this->encode_title}&site_type=website";
+        $alt = __( "Share on GREE", WP_SOCIAL_BOOKMARKING_LIGHT_DOMAIN );
+        $icon = WP_SOCIAL_BOOKMARKING_LIGHT_IMAGES_URL."/gree.png";
+    	return $this->link( $url, $alt, $icon, 16, 16 );
+    }
+    
 }
 
 function wp_social_bookmarking_light_default_options()
@@ -384,7 +407,9 @@ function wp_social_bookmarking_light_default_options()
     return array( "services" => "hatena, hatena_users, facebook, google_buzz, yahoo, livedoor, friendfeed, tweetmeme",
                   "position" => "top",
                   "single_page" => true,
-                  "is_page" => true );
+                  "is_page" => true,
+                  "mixi_check_key" => "",
+       			  "mixi_check_robots" => "noimage" );
 }
 
 function wp_social_bookmarking_light_options()
@@ -394,6 +419,18 @@ function wp_social_bookmarking_light_options()
 
 function wp_social_bookmarking_light_wp_head()
 {
+	// for mixi Check
+	$options = wp_social_bookmarking_light_options();
+	foreach( explode(",", $options['services']) as $service ){
+		$service = trim($service);
+		if( "mixi" == $service ){
+?>
+<meta name="mixi-check-robots" content="<?php echo $options['mixi_check_robots'] ?>" />
+<?php
+			break;
+		}
+	}
+	
 ?>
 <style>
 ul.wp_social_bookmarking_light{list-style:none !important;border:0 !important;padding:0;margin:0;}
@@ -411,8 +448,8 @@ a.wp_social_bookmarking_light_instapaper, a.wp_social_bookmarking_light_instapap
 function wp_social_bookmarking_light_admin_menu()
 {
     if( function_exists('add_options_page') ){
-        add_options_page( 'WP Social Bookmarking Light Options', 
-                          'WP Social Bookmarking Light Options', 
+        add_options_page( 'WP Social Bookmarking Light', 
+                          'WP Social Bookmarking Light', 
                           'manage_options', 
                           __FILE__, 
                           'wp_social_bookmarking_light_options_page' );
@@ -481,7 +518,9 @@ function wp_social_bookmarking_light_options_page()
         $options = array( "services" => $_POST["services"],
                           "position" => $_POST["position"],
                           "single_page" => $_POST["single_page"] == 'true',
-                          "is_page" => $_POST["is_page"] == 'true' );
+                          "is_page" => $_POST["is_page"] == 'true',
+        				  "mixi_check_key" => $_POST["mixi_check_key"],
+        				  "mixi_check_robots" => $_POST["mixi_check_robots"] );
         update_option( 'wp_social_bookmarking_light_options', $options );
         echo '<div class="updated"><p><strong>'.__( 'Options saved.', WP_SOCIAL_BOOKMARKING_LIGHT_DOMAIN ).'</strong></p></div>';
     }
@@ -514,11 +553,46 @@ function wp_social_bookmarking_light_options_page()
     padding: 3px;
 }
 </style>
+<?php 
+wp_enqueue_script('jquery');
+?>
+<script type="text/javascript" charset="utf-8">
+//<![CDATA[
+// for mixi
+function wsbl_options_mixi_toggle( first )
+{
+	var val = jQuery("#services_id").val();
+	var vals = val.split(",");
+	var has_mixi = false;
+	for( var i = 0; i < vals.length; i++ ){
+		val = vals[i].replace(/(^\s+)|(\s+$)/g, "");
+		if( val == "mixi" ){
+			has_mixi = true;
+		}
+	}
+
+	if( first ){
+		has_mixi ? jQuery("#mixi_settings").show() : jQuery("#mixi_settings").hide();
+	}
+	else{
+		has_mixi ? jQuery("#mixi_settings").slideDown() : jQuery("#mixi_settings").slideUp();
+	}
+}
+
+// read onece
+jQuery(document).ready(function(){
+	jQuery("#services_id").keyup(function(){
+		wsbl_options_mixi_toggle();
+	});
+	wsbl_options_mixi_toggle( true );
+});
+//]]>
+</script>
 <div class="wrap">
-    <h2>WP Social Bookmarking Light Options</h2>
+    <h2>WP Social Bookmarking Light</h2>
     
-    <h3>Required</h3>
     <form method='POST' action="<?php echo $_SERVER['REQUEST_URI'] ?>">
+    <h3><?php _e("General Settings") ?></h3>
     <table class='form-table'>
     <tr>
     <th scope="row">Position:</th>
@@ -550,9 +624,28 @@ function wp_social_bookmarking_light_options_page()
     </tr>
     <tr>
     <th scope="row">Services: <br/> <span style="font-size:10px">(comma-separated)</span></th>
-    <td><input type="text" name='services' value="<?php echo $options['services'] ?>"size=80 /></td>
+    <td><input type="text" id='services_id' name='services' value="<?php echo $options['services'] ?>"size=80 /></td>
     </tr>
     </table>
+
+	<div id='mixi_settings'>
+    <h3><?php _e("mixi Settings") ?></h3>
+    <table class='form-table'>
+    <tr>
+    <th scope="row">mixi check key:</th>
+    <td>
+    <input type="text" name='mixi_check_key' value="<?php echo $options['mixi_check_key'] ?>" size=50 />
+    </td>
+    </tr>
+    <tr>
+    <th scope="row">mixi check robots:</th>
+    <td>
+    <input type="text" name='mixi_check_robots' value="<?php echo $options['mixi_check_robots'] ?>" size=50 />
+    </td>
+    </tr>
+    </table>
+	</div>
+
     <p class="submit">
     <input class="button-primary" type="submit" name='save' value='<?php _e('Save Changes') ?>' />
     <input type="submit" name='reset' value='<?php _e('Reset') ?>' />
@@ -592,6 +685,8 @@ function wp_social_bookmarking_light_options_page()
     <tr><td>evernote</td><td>Evernote</td></tr>
     <tr><td>instapaper</td><td>Instapaper</td></tr>
     <tr><td>stumbleupon</td><td>StumbleUpon</td></tr>
+    <tr><td>mixi</td><td>mixi Check (require <a href="http://developer.mixi.co.jp/connect/mixi_plugin/mixi_check/mixicheck" onclick="window.open('http://developer.mixi.co.jp/connect/mixi_plugin/mixi_check/mixicheck'); return false;" >mixi check key</a>)</td></tr>
+    <tr><td>gree</td><td>GREE Social Feedback</td></tr>
     </table>
 </div>
 <?php
