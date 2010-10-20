@@ -1,10 +1,10 @@
 === WP Social Bookmarking Light ===
 Contributors: utahvich
 Donate link: http://www.ninxit.com/blog/
-Tags: links, social, bookmarks, bookmarking, Hatena, Livedoor Clip, BuzzURL, @nifty clip, Twitter, Tumblr, FC2 Bookmark, newsing, Choix, Yahoo!JAPAN Bookmark, Yahoo!Buzz, Google Bookmark, Delicious, Digg, FriendFeed, Google Buzz, Facebook, reddit, LinkedIn, Evernote, Instapaper, StumbleUpon
+Tags: links, social, bookmarks, bookmarking, Hatena, Livedoor Clip, BuzzURL, @nifty clip, Twitter, Tumblr, FC2 Bookmark, newsing, Choix, Yahoo!JAPAN Bookmark, Yahoo!Buzz, Google Bookmark, Delicious, Digg, FriendFeed, Google Buzz, Facebook, reddit, LinkedIn, Evernote, Instapaper, StumbleUpon, mixi, gree
 Requires at least: 2.9.0
 Tested up to: 3.0.1
-Stable tag: 1.4.3
+Stable tag: 1.5.1
 
 This plugin inserts social share links at the top or bottom of each post.
 
@@ -36,6 +36,8 @@ This is the list of used social sites:
 *  Evernote
 *  Instapaper
 *  StumbleUpon
+*  mixi Check
+*  GREE Social Feedback
 
 == Installation ==
 
@@ -50,6 +52,12 @@ This is the list of used social sites:
 3. This is how the plugin looks in manually inside your template.
 
 == Changelog ==
+
+= 1.5.1 =
+* Alter <style> to <style type="text/css">
+
+= 1.5.0 =
+* Added mixi Check, GREE Social Feedback.
 
 = 1.4.3 =
 * Bug fix: img style.
