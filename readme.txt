@@ -54,7 +54,7 @@ This is the list of used social sites:
 == Changelog ==
 
 = 1.5.1 =
-* Alter <style> to <style type="text/css">
+* Alter &lt;style&gt; to &lt;style type="text/css"&gt;
 
 = 1.5.0 =
 * Added mixi Check, GREE Social Feedback.
