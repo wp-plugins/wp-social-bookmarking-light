@@ -5,7 +5,7 @@ Plugin URI: http://www.ninxit.com/blog/2010/06/13/wp-social-bookmarking-light/
 Description: This plugin inserts social share links at the top or bottom of each post.
 Author: utahta
 Author URI: http://www.ninxit.com/blog/
-Version: 1.5.1
+Version: 1.5.2
 */
 /*
 Copyright 2010 utahta (email : labs.ninxit@gmail.com)
@@ -324,6 +324,15 @@ class WpSocialBookmarkingLight
     	return $this->link( $url, $alt, $icon, 16, 16 );
     }
     
+    /**
+     * @brief Facebook Like Button
+     */
+    function facebook_like()
+    {
+    	return $this->link_raw("<script src='http://connect.facebook.net/en_US/all.js#xfbml=1'></script>"
+    						  ."<fb:like href='{$this->encode_url}' layout='button_count' width='90'></fb:like>");
+    }
+    
    	/**
    	 * @brief reddit
    	 */
@@ -434,11 +443,11 @@ function wp_social_bookmarking_light_wp_head()
 ?>
 <style type="text/css">
 ul.wp_social_bookmarking_light{list-style:none !important;border:0 !important;padding:0;margin:0;}
-ul.wp_social_bookmarking_light li{float:left !important;border:0 !important;padding:0 4px 0 0 !important;margin:0 !important;height:17px !important;text-indent:0 !important;}
+ul.wp_social_bookmarking_light li{float:left !important;border:0 !important;padding:0 4px 0 0 !important;margin:0 !important;height:20px !important;text-indent:0 !important;}
 ul.wp_social_bookmarking_light li:before{content:"" !important;}
-ul.wp_social_bookmarking_light img{border:0 !important;padding:0;margin:0;vertical-align:baseline !important;}
+ul.wp_social_bookmarking_light img{border:0 !important;padding:0;margin:0;vertical-align:top !important;}
 .wp_social_bookmarking_light_clear{clear:both !important;}
-a.wp_social_bookmarking_light_instapaper {display: inline-block;font-family: 'Lucida Grande', Verdana, sans-serif;font-weight: bold;font-size: 11px;-webkit-border-radius: 8px;-moz-border-radius: 8px;color: #fff;background-color: #626262;border: 1px solid #626262;padding: 0px 3px 0px;text-shadow: #3b3b3b 1px 1px 0px;min-width: 62px;text-align: center;vertical-align: top;line-height:17px;}
+a.wp_social_bookmarking_light_instapaper {display: inline-block;font-family: 'Lucida Grande', Verdana, sans-serif;font-weight: bold;font-size: 11px;-webkit-border-radius: 8px;-moz-border-radius: 8px;color: #fff;background-color: #626262;border: 1px solid #626262;padding: 0px 3px 0px;text-shadow: #3b3b3b 1px 1px 0px;min-width: 62px;text-align: center;vertical-align:top;line-height:20px;}
 a.wp_social_bookmarking_light_instapaper, a.wp_social_bookmarking_light_instapaper:hover, a.wp_social_bookmarking_light_instapaper:active, a.wp_social_bookmarking_light_instapaper:visited {color: #fff; text-decoration: none; outline: none;}
 .wp_social_bookmarking_light_instapaper:focus {outline: none;}
 </style>
@@ -680,6 +689,7 @@ jQuery(document).ready(function(){
     <tr><td>digg</td><td>Digg</td></tr>
     <tr><td>friendfeed</td><td>FriendFeed</td></tr>
     <tr><td>facebook</td><td>Facebook Share</td></tr>
+    <tr><td>facebook_like</td><td>Facebook Like Button</td></tr>
     <tr><td>reddit</td><td>reddit</td></tr>
     <tr><td>linkedin</td><td>LinkedIn</td></tr>
     <tr><td>evernote</td><td>Evernote</td></tr>
