@@ -57,7 +57,7 @@ This is the list of used social sites:
 = 1.6.0 =
 * Added: Hatena Bookmark Button.
 * Updated: admin setting page.
-* Bug fixed: Twitter button did not work on the top page. Thanks to [yuya_takeyama](https://gist.github.com/675159)++
+* Bug fixed: Twitter button did not work on the top page. Thanks to [yuya-takeyama](https://gist.github.com/675159)++
 * Bug fixed: Mixi button did not work on the top page.
 
 = 1.5.2 =
