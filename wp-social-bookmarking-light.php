@@ -140,14 +140,17 @@ class WpSocialBookmarkingLight
     function twitter()
     {
         $options = wp_social_bookmarking_light_options();
-        
-        return $this->link_raw( '<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal"'
-                                ." data-url='{$this->url}'"
-                                ." data-text='{$this->title}'"
-                                ." data-via='{$options['twitter']['via']}'"
-                                ." data-lang='{$options['twitter']['lang']}'"
-                                .'>Tweet</a>'
-                                .'<script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>' );
+        $twitter = $options['twitter'];
+        return $this->link_raw('<iframe allowtransparency="true" frameborder="0" scrolling="no"'
+        						.' src="http://platform.twitter.com/widgets/tweet_button.html'
+        						.'?url='.$this->encode_url
+        						.'&amp;text='.$this->encode_title
+        						.'&amp;via='.$twitter['via']
+        						.'&amp;lang='.$twitter['lang']
+        						.'&amp;count='.$twitter['count']
+        						.'"'
+        						.' style="width:'.$twitter['width'].'px; height:'.$twitter['height'].'px;">'
+        						.'</iframe>');
     }
 
     /**
@@ -431,7 +434,7 @@ class WpSocialBookmarkingLight
         $data_key = $options['mixi']['check_key'];
         
         return $this->link_raw( '<a href="http://mixi.jp/share.pl" class="mixi-check-button"'
-        						 ." data-url='{$this->encode_url}'"
+        						 ." data-url='{$this->url}'"
                                  ." data-button='{$data_button}'"
         						 ." data-key='{$data_key}'>Check</a>"
                                  .'<script type="text/javascript" src="http://static.mixi.jp/js/share.js"></script>' );
@@ -460,7 +463,10 @@ function wp_social_bookmarking_light_default_options()
                                    'check_robots' => 'noimage',
                                    'button' => 'button-3'),
                   "twitter" => array('via' => "",
-                                      'lang' => "en"),
+                                      'lang' => "en",
+                                      'count' => 'horizontal',
+                                      'width' => '130',
+                                      'height' => '20'),
                   "hatena_button" => array('layout' => 'standard'),
                   'facebook_like' => array('action' => 'like',
                                             'colorscheme' => 'light'),
@@ -692,7 +698,10 @@ function wp_social_bookmarking_light_options_page()
                           				   'check_robots' => $_POST["mixi_check_robots"],
                                            'button' => $_POST['mixi_button']),
                           "twitter" => array('via' => $_POST['twitter_via'],
-                                              'lang' => $_POST['twitter_lang']),
+                                              'lang' => $_POST['twitter_lang'],
+                                              'count' => $_POST['twitter_count'],
+                                              'width' => $_POST['twitter_width'],
+                                              'height' => $_POST['twitter_height']),
                           'hatena_button' => array('layout' => $_POST['hatena_button_layout']),
                           'facebook_like' => array('action' => $_POST['facebook_like_action'],
                                                     'colorscheme' => $_POST['facebook_like_colorscheme']),
@@ -777,7 +786,7 @@ function wp_social_bookmarking_light_options_page()
             <tr>
             <th scope="row">Layout:</th>
             <td>
-            <select name='mixiPreview_button'>
+            <select name='mixi_button'>
             <option value='button-1' <?php if( $options['mixi']['button'] == 'button-1' ) echo 'selected'; ?>>button-1</option>
             <option value='button-2' <?php if( $options['mixi']['button'] == 'button-2' ) echo 'selected'; ?>>button-2</option>
             <option value='button-3' <?php if( $options['mixi']['button'] == 'button-3' ) echo 'selected'; ?>>button-3</option>
@@ -806,6 +815,27 @@ function wp_social_bookmarking_light_options_page()
             <option value='es' <?php if( $options['twitter']['lang'] == 'es' ) echo 'selected'; ?>>Spanish</option>
             <option value='ja' <?php if( $options['twitter']['lang'] == 'ja' ) echo 'selected'; ?>>Japanese</option>
             </select>
+            </td>
+            </tr>
+            <tr>
+            <th scope="row">Count:</th>
+            <td>
+            <select name='twitter_count'>
+            <option value='none' <?php if( $options['twitter']['count'] == 'none' ) echo 'selected'; ?>>none</option>
+            <option value='horizontal' <?php if( $options['twitter']['count'] == 'horizontal' ) echo 'selected'; ?>>horizontal</option>
+            </select>
+            </td>
+            </tr>
+            <tr>
+            <th scope="row">Width:</th>
+            <td>
+            <input type="text" name='twitter_width' value="<?php echo $options['twitter']['width'] ?>" size=20 />
+            </td>
+            </tr>
+            <tr>
+            <th scope="row">Height:</th>
+            <td>
+            <input type="text" name='twitter_height' value="<?php echo $options['twitter']['height'] ?>" size=20 />
             </td>
             </tr>
             </table>
@@ -850,7 +880,7 @@ function wp_social_bookmarking_light_options_page()
         
         <div id="tabs-10">
         	<p>A donation would help development of WP Social Bookmarking Light.</p>
-            <a href='http://www.pledgie.com/campaigns/14051'><img alt='Click here to lend your support to: WP Social Bookmarking Light and make a donation at www.pledgie.com !' src='http://www.pledgie.com/campaigns/14051.png?skin_name=chrome' border='0' /></a>
+            <a href='http://www.pledgie.com/campaigns/14051' target=_blank><img alt='Click here to lend your support to: WP Social Bookmarking Light and make a donation at www.pledgie.com !' src='http://www.pledgie.com/campaigns/14051.png?skin_name=chrome' border='0' /></a>
         </div>
     </div>
     <p class="submit">
