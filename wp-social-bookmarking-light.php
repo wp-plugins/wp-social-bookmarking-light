@@ -25,7 +25,8 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-define( "WP_SOCIAL_BOOKMARKING_LIGHT_IMAGES_URL", WP_PLUGIN_URL."/wp-social-bookmarking-light/images" );
+define( "WP_SOCIAL_BOOKMARKING_LIGHT_URL", WP_PLUGIN_URL."/wp-social-bookmarking-light" );
+define( "WP_SOCIAL_BOOKMARKING_LIGHT_IMAGES_URL", WP_SOCIAL_BOOKMARKING_LIGHT_URL."/images" );
 define( "WP_SOCIAL_BOOKMARKING_LIGHT_DOMAIN", "wp-social-bookmarking-light" );
 
 load_plugin_textdomain( WP_SOCIAL_BOOKMARKING_LIGHT_DOMAIN,
@@ -65,7 +66,7 @@ class WpSocialBookmarkingLight
     function link( $url, $alt, $icon, $width, $height ){
         $width = $width ? "width='$width'" : "";
         $height = $height ? "height='$height'" : "";
-    	return $this->link_raw( "<a href='{$url}' title='{$alt}' rel=nofollow class='wp_social_bookmarking_light_a' target=_blank>"
+        return $this->link_raw( "<a href='{$url}' title='{$alt}' rel=nofollow class='wp_social_bookmarking_light_a' target=_blank>"
                                ."<img src='{$icon}' alt='{$alt}' title='{$alt}' $width $height class='wp_social_bookmarking_light_img' />"
                                ."</a>" );
     }
@@ -86,6 +87,21 @@ class WpSocialBookmarkingLight
         $alt = sprintf( __("Hatena Bookmark - %s", WP_SOCIAL_BOOKMARKING_LIGHT_DOMAIN), $this->title );
         $icon = "http://b.hatena.ne.jp/entry/image/{$this->url}";
         return $this->link( $url, $alt, $icon, null, null );
+    }
+    function hatena_button()
+    {
+        $options = wp_social_bookmarking_light_options();
+        $url = "http://b.hatena.ne.jp/entry/{$this->url}";
+        $title = $this->title;
+        $alt = __( "Bookmark this on Hatena Bookmark", WP_SOCIAL_BOOKMARKING_LIGHT_DOMAIN );
+        return $this->link_raw('<a href="'.$url.'"'
+        						.' class="hatena-bookmark-button"'
+        						.' data-hatena-bookmark-title="'.$title.'"'
+        						.' data-hatena-bookmark-layout="'.$options['hatena_button']['layout'].'"'
+        						.' title="'.$alt.'">'
+        						.' <img src="http://b.st-hatena.com/images/entry-button/button-only.gif"'
+        						.' alt="'.$alt.'" width="20" height="20" style="border: none;" /></a>'
+        						.'<script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>');
     }
     
     /**
@@ -123,8 +139,18 @@ class WpSocialBookmarkingLight
      */
     function twitter()
     {
-        return $this->link_raw( '<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal">Tweet</a>'
-        						.'<script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>' );
+        $options = wp_social_bookmarking_light_options();
+        $twitter = $options['twitter'];
+        return $this->link_raw('<iframe allowtransparency="true" frameborder="0" scrolling="no"'
+        						.' src="http://platform.twitter.com/widgets/tweet_button.html'
+        						.'?url='.$this->encode_url
+        						.'&amp;text='.$this->encode_title
+        						.'&amp;via='.$twitter['via']
+        						.'&amp;lang='.$twitter['lang']
+        						.'&amp;count='.$twitter['count']
+        						.'"'
+        						.' style="width:'.$twitter['width'].'px; height:'.$twitter['height'].'px;">'
+        						.'</iframe>');
     }
 
     /**
@@ -201,7 +227,7 @@ class WpSocialBookmarkingLight
     }
     function nifty_users()
     {
-    	$url = '#';
+        $url = '#';
         $alt = sprintf( __("@nifty clip - %s", WP_SOCIAL_BOOKMARKING_LIGHT_DOMAIN), $this->title );
         $icon = "http://api.clip.nifty.com/api/v1/image/counter/{$this->url}";
         return $this->link( $url, $alt, $icon, null, null );
@@ -274,8 +300,8 @@ class WpSocialBookmarkingLight
      */
     function google_buzz()
     {
-    	$url = "http://www.google.com/buzz/post?url={$this->encode_url}&message={$this->encode_title}";
-    	$alt = __( "Post to Google Buzz", WP_SOCIAL_BOOKMARKING_LIGHT_DOMAIN );
+        $url = "http://www.google.com/buzz/post?url={$this->encode_url}&message={$this->encode_title}";
+        $alt = __( "Post to Google Buzz", WP_SOCIAL_BOOKMARKING_LIGHT_DOMAIN );
         $icon = WP_SOCIAL_BOOKMARKING_LIGHT_IMAGES_URL."/google-buzz.png";
         return $this->link( $url, $alt, $icon, 16, 16 );
     }
@@ -321,7 +347,7 @@ class WpSocialBookmarkingLight
         $url = "http://www.facebook.com/share.php?u={$this->encode_url}&t={$this->encode_title}";
         $alt = __( "Share on Facebook", WP_SOCIAL_BOOKMARKING_LIGHT_DOMAIN );
         $icon = WP_SOCIAL_BOOKMARKING_LIGHT_IMAGES_URL."/facebook.png";
-    	return $this->link( $url, $alt, $icon, 16, 16 );
+        return $this->link( $url, $alt, $icon, 16, 16 );
     }
     
     /**
@@ -329,19 +355,31 @@ class WpSocialBookmarkingLight
      */
     function facebook_like()
     {
-    	return $this->link_raw("<script src='http://connect.facebook.net/en_US/all.js#xfbml=1'></script>"
-    						  ."<fb:like href='{$this->encode_url}' layout='button_count' width='90'></fb:like>");
+        $options = wp_social_bookmarking_light_options();
+        $action = $options['facebook_like']['action'];
+        $colorscheme = $options['facebook_like']['colorscheme'];
+        
+        return $this->link_raw('<iframe src="http://www.facebook.com/plugins/like.php?href='.$this->encode_url
+        						.'&amp;layout=button_count'
+        						.'&amp;show_faces=false'
+        						.'&amp;width=80'
+        						.'&amp;action='.$action
+        						.'&amp;colorscheme='.$colorscheme
+        						.'&amp;height=20"'
+        						.' scrolling="no" frameborder="0"'
+        						.' style="border:none; overflow:hidden; width:100px; height:20px;"'
+        						.' allowTransparency="true"></iframe>');
     }
-    
-   	/**
-   	 * @brief reddit
-   	 */
+
+   /**
+    * @brief reddit
+    */
     function reddit()
     {
         $url = "http://www.reddit.com/submit?url={$this->encode_url}&title={$this->encode_title}";
         $alt = __( "Share on reddit", WP_SOCIAL_BOOKMARKING_LIGHT_DOMAIN );
         $icon = WP_SOCIAL_BOOKMARKING_LIGHT_IMAGES_URL."/reddit.png";
-    	return $this->link( $url, $alt, $icon, 16, 16 );
+        return $this->link( $url, $alt, $icon, 16, 16 );
     }
     
     /**
@@ -352,7 +390,7 @@ class WpSocialBookmarkingLight
         $url = "http://www.linkedin.com/shareArticle?mini=true&url={$this->encode_url}&title={$this->encode_title}";
         $alt = __( "Share on LinkedIn", WP_SOCIAL_BOOKMARKING_LIGHT_DOMAIN );
         $icon = WP_SOCIAL_BOOKMARKING_LIGHT_IMAGES_URL."/linkedin.png";
-    	return $this->link( $url, $alt, $icon, 16, 16 );
+        return $this->link( $url, $alt, $icon, 16, 16 );
     }
     
     /**
@@ -360,19 +398,19 @@ class WpSocialBookmarkingLight
      */
     function evernote()
     {
-	  	$icon = WP_SOCIAL_BOOKMARKING_LIGHT_IMAGES_URL."/evernote.png";
-	  	$script = "(function(){EN_CLIP_HOST='http://www.evernote.com';try{var x=document.createElement('SCRIPT');x.type='text/javascript';x.src=EN_CLIP_HOST+'/public/bookmarkClipper.js?'+(new Date().getTime()/100000);document.getElementsByTagName('head')[0].appendChild(x);}catch(e){location.href=EN_CLIP_HOST+'/clip.action?url='+encodeURIComponent(location.href)+'&title='+encodeURIComponent(document.title);}})();";
-	  	$img = "<img src='${icon}' width='16' height='16' />";
-		return $this->link_raw( "<a href='#' title='Clip to Evernote' onclick=\"${script} return false;\">${img}</a>" );
-	}
+        $icon = WP_SOCIAL_BOOKMARKING_LIGHT_IMAGES_URL."/evernote.png";
+        $script = "(function(){EN_CLIP_HOST='http://www.evernote.com';try{var x=document.createElement('SCRIPT');x.type='text/javascript';x.src=EN_CLIP_HOST+'/public/bookmarkClipper.js?'+(new Date().getTime()/100000);document.getElementsByTagName('head')[0].appendChild(x);}catch(e){location.href=EN_CLIP_HOST+'/clip.action?url='+encodeURIComponent(location.href)+'&title='+encodeURIComponent(document.title);}})();";
+        $img = "<img src='${icon}' width='16' height='16' />";
+        return $this->link_raw( "<a href='#' title='Clip to Evernote' onclick=\"${script} return false;\">${img}</a>" );
+    }
     
     /**
      * @brief Instapaper
      */
     function instapaper()
     {
-	  	$href = "javascript:function iprl5(){var d=document,z=d.createElement(&#039;scr&#039;+&#039;ipt&#039;),b=d.body,l=d.location;try{if(!b)throw(0);d.title=&#039;(Saving...) &#039;+d.title;z.setAttribute(&#039;src&#039;,l.protocol+&#039;//www.instapaper.com/j/GKo8MDzHWjRx?u=&#039;+encodeURIComponent(l.href)+&#039;&amp;t=&#039;+(new Date().getTime()));b.appendChild(z);}catch(e){alert(&#039;Please wait until the page has loaded.&#039;);}}iprl5();void(0)";
-		return $this->link_raw( '<a href="'.$href.'" class="wp_social_bookmarking_light_instapaper" title="Read Later">Read Later</a>' );
+        $href = "javascript:function iprl5(){var d=document,z=d.createElement(&#039;scr&#039;+&#039;ipt&#039;),b=d.body,l=d.location;try{if(!b)throw(0);d.title=&#039;(Saving...) &#039;+d.title;z.setAttribute(&#039;src&#039;,l.protocol+&#039;//www.instapaper.com/j/GKo8MDzHWjRx?u=&#039;+encodeURIComponent(l.href)+&#039;&amp;t=&#039;+(new Date().getTime()));b.appendChild(z);}catch(e){alert(&#039;Please wait until the page has loaded.&#039;);}}iprl5();void(0)";
+        return $this->link_raw( '<a href="'.$href.'" class="wp_social_bookmarking_light_instapaper" style="line-height:17px !important" title="Read Later">Read Later</a>' );
     }
     
     /**
@@ -383,7 +421,7 @@ class WpSocialBookmarkingLight
         $url = "http://www.stumbleupon.com/submit?url={$this->encode_url}&title={$this->encode_title}";
         $alt = __( "Share on StumbleUpon", WP_SOCIAL_BOOKMARKING_LIGHT_DOMAIN );
         $icon = WP_SOCIAL_BOOKMARKING_LIGHT_IMAGES_URL."/stumbleupon.png";
-    	return $this->link( $url, $alt, $icon, 16, 16 );
+        return $this->link( $url, $alt, $icon, 16, 16 );
     }
     
     /**
@@ -391,11 +429,15 @@ class WpSocialBookmarkingLight
      */
     function mixi()
     {
-    	$options = wp_social_bookmarking_light_options();
-    	$data_key = $options['mixi_check_key'];
-    	
-    	return $this->link_raw( '<a href="http://mixi.jp/share.pl" class="mixi-check-button" data-button="button-3" data-key="'.$data_key.'">Check</a>'
-    						   .'<script type="text/javascript" src="http://static.mixi.jp/js/share.js"></script>' );
+        $options = wp_social_bookmarking_light_options();
+        $data_button = $options['mixi']['button'];
+        $data_key = $options['mixi']['check_key'];
+        
+        return $this->link_raw( '<a href="http://mixi.jp/share.pl" class="mixi-check-button"'
+        						 ." data-url='{$this->url}'"
+                                 ." data-button='{$data_button}'"
+        						 ." data-key='{$data_key}'>Check</a>"
+                                 .'<script type="text/javascript" src="http://static.mixi.jp/js/share.js"></script>' );
     }
     
     /**
@@ -406,7 +448,7 @@ class WpSocialBookmarkingLight
         $url = "http://gree.jp/?mode=share&act=write&url={$this->encode_url}&title={$this->encode_title}&site_type=website";
         $alt = __( "Share on GREE", WP_SOCIAL_BOOKMARKING_LIGHT_DOMAIN );
         $icon = WP_SOCIAL_BOOKMARKING_LIGHT_IMAGES_URL."/gree.png";
-    	return $this->link( $url, $alt, $icon, 16, 16 );
+        return $this->link( $url, $alt, $icon, 16, 16 );
     }
     
 }
@@ -417,34 +459,67 @@ function wp_social_bookmarking_light_default_options()
                   "position" => "top",
                   "single_page" => true,
                   "is_page" => true,
-                  "mixi_check_key" => "",
-       			  "mixi_check_robots" => "noimage" );
+                  "mixi" => array('check_key' => '',
+                                   'check_robots' => 'noimage',
+                                   'button' => 'button-3'),
+                  "twitter" => array('via' => "",
+                                      'lang' => "en",
+                                      'count' => 'horizontal',
+                                      'width' => '130',
+                                      'height' => '20'),
+                  "hatena_button" => array('layout' => 'standard'),
+                  'facebook_like' => array('action' => 'like',
+                                            'colorscheme' => 'light'),
+    );
 }
 
 function wp_social_bookmarking_light_options()
 {
-    return array_merge( wp_social_bookmarking_light_default_options(), get_option("wp_social_bookmarking_light_options", array()) );
+    $options = get_option("wp_social_bookmarking_light_options", array());
+    
+    // Compatibility version 1.5.2 or less
+    if(!is_array($options['mixi'])){
+        $options['mixi'] = array();
+        if(isset($options['mixi_check_key']) || isset($options['mixi_check_robots'])){
+            $options['mixi']['check_key'] = $options['mixi_check_key'];
+            $options['mixi']['check_robots'] = $options['mixi_check_robots'];
+            unset($options['mixi_check_key']);
+            unset($options['mixi_check_robots']);
+        }
+    }
+    
+    // array merge recursive overwrite (1 depth)
+    $default_options = wp_social_bookmarking_light_default_options();
+    foreach( $default_options as $key => $val ){
+        if(is_array($default_options[$key])){
+            if(!is_array($options[$key])){
+                $options[$key] = array();
+            }
+            $options[$key] = array_merge($default_options[$key], $options[$key]);
+        }
+    }
+    return array_merge( wp_social_bookmarking_light_default_options(), $options );
 }
 
 function wp_social_bookmarking_light_wp_head()
 {
-	// for mixi Check
-	$options = wp_social_bookmarking_light_options();
-	foreach( explode(",", $options['services']) as $service ){
-		$service = trim($service);
-		if( "mixi" == $service ){
+    // for mixi Check
+    $options = wp_social_bookmarking_light_options();
+    foreach( explode(",", $options['services']) as $service ){
+        $service = trim($service);
+        if( "mixi" == $service ){
 ?>
-<meta name="mixi-check-robots" content="<?php echo $options['mixi_check_robots'] ?>" />
+<meta name="mixi-check-robots" content="<?php echo $options['mixi']['check_robots'] ?>" />
 <?php
-			break;
-		}
-	}
-	
+            break;
+        }
+    }
+    
 ?>
 <style type="text/css">
 ul.wp_social_bookmarking_light{list-style:none !important;border:0 !important;padding:0;margin:0;}
 ul.wp_social_bookmarking_light li{float:left !important;border:0 !important;padding:0 4px 0 0 !important;margin:0 !important;height:20px !important;text-indent:0 !important;}
-ul.wp_social_bookmarking_light li:before{content:"" !important;}
+#ul.wp_social_bookmarking_light li:before{content:"" !important;}
 ul.wp_social_bookmarking_light img{border:0 !important;padding:0;margin:0;vertical-align:top !important;}
 .wp_social_bookmarking_light_clear{clear:both !important;}
 a.wp_social_bookmarking_light_instapaper {display: inline-block;font-family: 'Lucida Grande', Verdana, sans-serif;font-weight: bold;font-size: 11px;-webkit-border-radius: 8px;-moz-border-radius: 8px;color: #fff;background-color: #626262;border: 1px solid #626262;padding: 0px 3px 0px;text-shadow: #3b3b3b 1px 1px 0px;min-width: 62px;text-align: center;vertical-align:top;line-height:20px;}
@@ -452,17 +527,6 @@ a.wp_social_bookmarking_light_instapaper, a.wp_social_bookmarking_light_instapap
 .wp_social_bookmarking_light_instapaper:focus {outline: none;}
 </style>
 <?php
-}
-
-function wp_social_bookmarking_light_admin_menu()
-{
-    if( function_exists('add_options_page') ){
-        add_options_page( 'WP Social Bookmarking Light', 
-                          'WP Social Bookmarking Light', 
-                          'manage_options', 
-                          __FILE__, 
-                          'wp_social_bookmarking_light_options_page' );
-    }
 }
 
 function wp_social_bookmarking_light_output( $services )
@@ -480,9 +544,13 @@ function wp_social_bookmarking_light_output( $services )
     return "<ul class='wp_social_bookmarking_light'>{$out}</ul><br class='wp_social_bookmarking_light_clear' />";
 }
 
-function wp_social_bookmarking_light_output_e( $services )
+function wp_social_bookmarking_light_output_e( $services=null )
 {
-	echo wp_social_bookmarking_light_output( $services );
+    if($services == null){
+        $options = wp_social_bookmarking_light_options();
+        $services = $options['services'];
+    }
+    echo wp_social_bookmarking_light_output( $services );
 }
 
 function wp_social_bookmarking_light_the_content( $content )
@@ -496,7 +564,7 @@ function wp_social_bookmarking_light_the_content( $content )
         return $content;
     }
     if( !$options['is_page'] && is_page() ){
-    	return $content;
+        return $content;
     }
 
     $out = wp_social_bookmarking_light_output( $options['services'] );
@@ -512,35 +580,21 @@ function wp_social_bookmarking_light_the_content( $content )
     return $content;
 }
 
-function wp_social_bookmarking_light_init()
+// admin pages
+function wp_social_bookmarking_light_admin_print_scripts()
 {
-    add_action( 'wp_head', 'wp_social_bookmarking_light_wp_head' );
-    add_action( 'admin_menu', 'wp_social_bookmarking_light_admin_menu' );
-    add_filter( 'the_content', 'wp_social_bookmarking_light_the_content' );
+    wp_enqueue_script('jquery');
+    wp_enqueue_script('jquery-ui-core');
+    wp_enqueue_script('jquery-ui-tabs');
 }
-add_action( 'init', 'wp_social_bookmarking_light_init' );
 
-// options page
-function wp_social_bookmarking_light_options_page()
+function wp_social_bookmarking_light_admin_print_styles()
 {
-    if( isset( $_POST['save'] ) ){
-        $options = array( "services" => $_POST["services"],
-                          "position" => $_POST["position"],
-                          "single_page" => $_POST["single_page"] == 'true',
-                          "is_page" => $_POST["is_page"] == 'true',
-        				  "mixi_check_key" => $_POST["mixi_check_key"],
-        				  "mixi_check_robots" => $_POST["mixi_check_robots"] );
-        update_option( 'wp_social_bookmarking_light_options', $options );
-        echo '<div class="updated"><p><strong>'.__( 'Options saved.', WP_SOCIAL_BOOKMARKING_LIGHT_DOMAIN ).'</strong></p></div>';
-    }
-    else if( isset( $_POST['reset'] ) ){
-    	$options = wp_social_bookmarking_light_default_options();
-        update_option( 'wp_social_bookmarking_light_options', $options );
-        echo '<div class="updated"><p><strong>'.__( 'Reset options.', WP_SOCIAL_BOOKMARKING_LIGHT_DOMAIN ).'</strong></p></div>';
-    }
-    else{
-        $options = wp_social_bookmarking_light_options();
-    }
+    wp_enqueue_style('jquery-ui-tabs', WP_SOCIAL_BOOKMARKING_LIGHT_URL."/libs/jquery/css/pepper-grinder/jquery-ui-1.8.6.custom.css");
+}
+
+function wp_social_bookmarking_light_admin_head()
+{
 ?>
 <style type="text/css">
 .wp_social_bookmarking_light_options{
@@ -556,115 +610,290 @@ function wp_social_bookmarking_light_options_page()
     margin: 0px;
     padding: 3px;
 }
-.wp_social_bookmarking_light_options td{
+.wp_social_bookmarking_light_options td{en
     text-align: left;
     margin: 0px;
     padding: 3px;
 }
 </style>
-<?php 
-wp_enqueue_script('jquery');
-?>
+
 <script type="text/javascript" charset="utf-8">
 //<![CDATA[
-// for mixi
-function wsbl_options_mixi_toggle( first )
+function wsbl_options_toggle(service_id, is_simply)
 {
-	var val = jQuery("#services_id").val();
-	var vals = val.split(",");
-	var has_mixi = false;
-	for( var i = 0; i < vals.length; i++ ){
-		val = vals[i].replace(/(^\s+)|(\s+$)/g, "");
-		if( val == "mixi" ){
-			has_mixi = true;
-		}
-	}
+    var val = jQuery("#services_id").val();
+    var vals = val.split(",");
+    var has_option = false;
+    for(var i = 0; i < vals.length; i++){
+        val = vals[i].replace(/(^\s+)|(\s+$)/g, "");
+        if(val == service_id){
+            has_option = true;
+        }
+    }
 
-	if( first ){
-		has_mixi ? jQuery("#mixi_settings").show() : jQuery("#mixi_settings").hide();
-	}
-	else{
-		has_mixi ? jQuery("#mixi_settings").slideDown() : jQuery("#mixi_settings").slideUp();
-	}
+    var service_id_settings = "#" + service_id + "_settings";
+    if(is_simply){
+        has_option ? jQuery(service_id_settings).show() : jQuery(service_id_settings).hide();
+    }
+    else{
+        has_option ? jQuery(service_id_settings).slideDown() : jQuery(service_id_settings).slideUp();
+    }
+}
+
+function wsbl_options_toggle_all(is_simply)
+{
+    wsbl_options_toggle("mixi", is_simply);
+    wsbl_options_toggle("twitter", is_simply);
+    wsbl_options_toggle("hatena_button", is_simply);
+    wsbl_options_toggle("facebook_like", is_simply);
 }
 
 // read onece
 jQuery(document).ready(function(){
-	jQuery("#services_id").keyup(function(){
-		wsbl_options_mixi_toggle();
-	});
-	wsbl_options_mixi_toggle( true );
+    jQuery("#tabs").tabs();
+
+    jQuery("#services_id").keyup(function(){
+        wsbl_options_toggle_all(false);
+    });
+    wsbl_options_toggle_all(true);
 });
 //]]>
 </script>
+<?php
+}
+
+function wp_social_bookmarking_light_admin_menu()
+{
+    if( function_exists('add_options_page') ){
+        $page = add_options_page( 'WP Social Bookmarking Light', 
+                          'WP Social Bookmarking Light', 
+                          'manage_options', 
+                          __FILE__, 
+                          'wp_social_bookmarking_light_options_page' );
+                          
+        add_action('admin_print_styles-'.$page, 'wp_social_bookmarking_light_admin_print_styles');
+        add_action('admin_print_scripts-'.$page, 'wp_social_bookmarking_light_admin_print_scripts');
+        add_action('admin_head-'.$page, 'wp_social_bookmarking_light_admin_head');
+    }
+}
+
+// initialize all
+function wp_social_bookmarking_light_init()
+{
+    add_action( 'wp_head', 'wp_social_bookmarking_light_wp_head' );
+    add_filter( 'the_content', 'wp_social_bookmarking_light_the_content' );
+    add_action( 'admin_menu', 'wp_social_bookmarking_light_admin_menu' );
+}
+add_action( 'init', 'wp_social_bookmarking_light_init' );
+
+// options page
+function wp_social_bookmarking_light_options_page()
+{
+    if( isset( $_POST['save'] ) ){
+        $options = array("services" => $_POST["services"],
+                          "position" => $_POST["position"],
+                          "single_page" => $_POST["single_page"] == 'true',
+                          "is_page" => $_POST["is_page"] == 'true',
+                          "mixi" => array('check_key' => $_POST["mixi_check_key"],
+                          				   'check_robots' => $_POST["mixi_check_robots"],
+                                           'button' => $_POST['mixi_button']),
+                          "twitter" => array('via' => $_POST['twitter_via'],
+                                              'lang' => $_POST['twitter_lang'],
+                                              'count' => $_POST['twitter_count'],
+                                              'width' => $_POST['twitter_width'],
+                                              'height' => $_POST['twitter_height']),
+                          'hatena_button' => array('layout' => $_POST['hatena_button_layout']),
+                          'facebook_like' => array('action' => $_POST['facebook_like_action'],
+                                                    'colorscheme' => $_POST['facebook_like_colorscheme']),
+        );
+        update_option( 'wp_social_bookmarking_light_options', $options );
+        echo '<div class="updated"><p><strong>'.__( 'Options saved.', WP_SOCIAL_BOOKMARKING_LIGHT_DOMAIN ).'</strong></p></div>';
+    }
+    else if( isset( $_POST['reset'] ) ){
+        $options = wp_social_bookmarking_light_default_options();
+        update_option( 'wp_social_bookmarking_light_options', $options );
+        echo '<div class="updated"><p><strong>'.__( 'Reset options.', WP_SOCIAL_BOOKMARKING_LIGHT_DOMAIN ).'</strong></p></div>';
+    }
+    else{
+        $options = wp_social_bookmarking_light_options();
+    }
+?>
+
 <div class="wrap">
     <h2>WP Social Bookmarking Light</h2>
-    
+
     <form method='POST' action="<?php echo $_SERVER['REQUEST_URI'] ?>">
-    <h3><?php _e("General Settings") ?></h3>
-    <table class='form-table'>
-    <tr>
-    <th scope="row">Position:</th>
-    <td>
-    <select name='position'>
-    <option value='top' <?php if( $options['position'] == 'top' ) echo 'selected'; ?>>Top</option>
-    <option value='bottom' <?php if( $options['position'] == 'bottom' ) echo 'selected'; ?>>Bottom</option>
-    <option value='none' <?php if( $options['position'] == 'none' ) echo 'selected'; ?>>None</option>
-    </select>
-    </td>
-    </tr>
-    <tr>
-    <th scope="row">Is Singular:</th>
-    <td>
-    <select name='single_page'>
-    <option value='true' <?php if( $options['single_page'] == true ) echo 'selected'; ?>>Enabled</option>
-    <option value='false' <?php if( $options['single_page'] == false ) echo 'selected'; ?>>Disabled</option>
-    </select>
-    </td>
-    </tr>
-    <tr>
-    <th scope="row">Is Page:</th>
-    <td>
-    <select name='is_page'>
-    <option value='true' <?php if( $options['is_page'] == true ) echo 'selected'; ?>>Enabled</option>
-    <option value='false' <?php if( $options['is_page'] == false ) echo 'selected'; ?>>Disabled</option>
-    </select>
-    </td>
-    </tr>
-    <tr>
-    <th scope="row">Services: <br/> <span style="font-size:10px">(comma-separated)</span></th>
-    <td><input type="text" id='services_id' name='services' value="<?php echo $options['services'] ?>"size=80 /></td>
-    </tr>
-    </table>
+    <div id="tabs">
+        <ul>
+            <li><a href="#tabs-1"><span><?php _e("General Settings") ?></span></a></li>
+            <li id='mixi_settings'><a href="#tabs-2"><span><?php _e("mixi") ?></span></a></li>
+            <li id='twitter_settings'><a href="#tabs-3"><span><?php _e("twitter") ?></span></a></li>
+            <li id='hatena_button_settings'><a href="#tabs-4"><span><?php _e("hatena_button") ?></span></a></li>
+            <li id='facebook_like_settings'><a href="#tabs-5"><span><?php _e("facebook_like") ?></span></a></li>
+            <li><a href="#tabs-10"><span><?php _e("Donation") ?></span></a></li>
+        </ul>
+        <div id="tabs-1">
+            <table class='form-table'>
+            <tr>
+            <th scope="row">Position:</th>
+            <td>
+            <select name='position'>
+            <option value='top' <?php if( $options['position'] == 'top' ) echo 'selected'; ?>>Top</option>
+            <option value='bottom' <?php if( $options['position'] == 'bottom' ) echo 'selected'; ?>>Bottom</option>
+            <option value='none' <?php if( $options['position'] == 'none' ) echo 'selected'; ?>>None</option>
+            </select>
+            </td>
+            </tr>
+            <tr>
+            <th scope="row">Is Singular:</th>
+            <td>
+            <select name='single_page'>
+            <option value='true' <?php if( $options['single_page'] == true ) echo 'selected'; ?>>Enabled</option>
+            <option value='false' <?php if( $options['single_page'] == false ) echo 'selected'; ?>>Disabled</option>
+            </select>
+            </td>
+            </tr>
+            <tr>
+            <th scope="row">Is Page:</th>
+            <td>
+            <select name='is_page'>
+            <option value='true' <?php if( $options['is_page'] == true ) echo 'selected'; ?>>Enabled</option>
+            <option value='false' <?php if( $options['is_page'] == false ) echo 'selected'; ?>>Disabled</option>
+            </select>
+            </td>
+            </tr>
+            <tr>
+            <th scope="row">Services: <br/> <span style="font-size:10px">(comma-separated)</span></th>
+            <td><input type="text" id='services_id' name='services' value="<?php echo $options['services'] ?>"size=120 style="font-size:12px !important" /></td>
+            </tr>
+            </table>
+        </div>
+        
+        <div id="tabs-2">
+            <table class='form-table'>
+            <tr>
+            <th scope="row">Check Key:</th>
+            <td>
+            <input type="text" name='mixi_check_key' value="<?php echo $options['mixi']["check_key"] ?>" size=50 />
+            </td>
+            </tr>
+            <tr>
+            <th scope="row">Check Robots:</th>
+            <td>
+            <input type="text" name='mixi_check_robots' value="<?php echo $options['mixi']["check_robots"] ?>" size=50 />
+            </td>
+            </tr>
+            <tr>
+            <th scope="row">Layout:</th>
+            <td>
+            <select name='mixi_button'>
+            <option value='button-1' <?php if( $options['mixi']['button'] == 'button-1' ) echo 'selected'; ?>>button-1</option>
+            <option value='button-2' <?php if( $options['mixi']['button'] == 'button-2' ) echo 'selected'; ?>>button-2</option>
+            <option value='button-3' <?php if( $options['mixi']['button'] == 'button-3' ) echo 'selected'; ?>>button-3</option>
+            <option value='button-4' <?php if( $options['mixi']['button'] == 'button-4' ) echo 'selected'; ?>>button-4</option>
+            </select>
+            </td>
+            </tr>
+            </table>
+        </div>
 
-	<div id='mixi_settings'>
-    <h3><?php _e("mixi Settings") ?></h3>
-    <table class='form-table'>
-    <tr>
-    <th scope="row">mixi check key:</th>
-    <td>
-    <input type="text" name='mixi_check_key' value="<?php echo $options['mixi_check_key'] ?>" size=50 />
-    </td>
-    </tr>
-    <tr>
-    <th scope="row">mixi check robots:</th>
-    <td>
-    <input type="text" name='mixi_check_robots' value="<?php echo $options['mixi_check_robots'] ?>" size=50 />
-    </td>
-    </tr>
-    </table>
-	</div>
+        <div id="tabs-3">
+            <table class='form-table'>
+            <tr>
+            <th scope="row">Via: <br> <span style="font-size:10px">(your twitter account)</span></th>
+            <td>
+            <input type="text" name='twitter_via' value="<?php echo $options['twitter']['via'] ?>" size=50 />
+            </td>
+            </tr>
+            <tr>
+            <th scope="row">Language:</th>
+            <td>
+            <select name='twitter_lang'>
+            <option value='en' <?php if( $options['twitter']['lang'] == 'en' ) echo 'selected'; ?>>English</option>
+            <option value='fr' <?php if( $options['twitter']['lang'] == 'fr' ) echo 'selected'; ?>>French</option>
+            <option value='de' <?php if( $options['twitter']['lang'] == 'de' ) echo 'selected'; ?>>German</option>
+            <option value='es' <?php if( $options['twitter']['lang'] == 'es' ) echo 'selected'; ?>>Spanish</option>
+            <option value='ja' <?php if( $options['twitter']['lang'] == 'ja' ) echo 'selected'; ?>>Japanese</option>
+            </select>
+            </td>
+            </tr>
+            <tr>
+            <th scope="row">Count:</th>
+            <td>
+            <select name='twitter_count'>
+            <option value='none' <?php if( $options['twitter']['count'] == 'none' ) echo 'selected'; ?>>none</option>
+            <option value='horizontal' <?php if( $options['twitter']['count'] == 'horizontal' ) echo 'selected'; ?>>horizontal</option>
+            </select>
+            </td>
+            </tr>
+            <tr>
+            <th scope="row">Width:</th>
+            <td>
+            <input type="text" name='twitter_width' value="<?php echo $options['twitter']['width'] ?>" size=20 />
+            </td>
+            </tr>
+            <tr>
+            <th scope="row">Height:</th>
+            <td>
+            <input type="text" name='twitter_height' value="<?php echo $options['twitter']['height'] ?>" size=20 />
+            </td>
+            </tr>
+            </table>
+        </div>
 
+        <div id="tabs-4">
+            <table class='form-table'>
+            <tr>
+            <th scope="row">Layout:</th>
+            <td>
+            <select name='hatena_button_layout'>
+            <option value='standard' <?php if( $options['hatena_button']['layout'] == 'standard' ) echo 'selected'; ?>>standard</option>
+            <option value='simple' <?php if( $options['hatena_button']['layout'] == 'simple' ) echo 'selected'; ?>>simple</option>
+            </select>
+            </td>
+            </tr>
+            </table>
+        </div>
+
+        <div id="tabs-5">
+            <table class='form-table'>
+            <tr>
+            <th scope="row">Action:</th>
+            <td>
+            <select name='facebook_like_action'>
+            <option value='like' <?php if( $options['facebook_like']['action'] == 'like' ) echo 'selected'; ?>>like</option>
+            <option value='recommend' <?php if( $options['facebook_like']['action'] == 'recommend' ) echo 'selected'; ?>>recommend</option>
+            </select>
+            </td>
+            </tr>
+            <tr>
+            <th scope="row">Color Scheme:</th>
+            <td>
+            <select name='facebook_like_colorscheme'>
+            <option value='light' <?php if( $options['facebook_like']['colorscheme'] == 'light' ) echo 'selected'; ?>>light</option>
+            <option value='dark' <?php if( $options['facebook_like']['colorscheme'] == 'dark' ) echo 'selected'; ?>>dark</option>
+            </select>
+            </td>
+            </tr>
+            </table>
+        </div>
+        
+        <div id="tabs-10">
+        	<p>A donation would help development of WP Social Bookmarking Light.</p>
+            <a href='http://www.pledgie.com/campaigns/14051' target=_blank><img alt='Click here to lend your support to: WP Social Bookmarking Light and make a donation at www.pledgie.com !' src='http://www.pledgie.com/campaigns/14051.png?skin_name=chrome' border='0' /></a>
+        </div>
+    </div>
     <p class="submit">
     <input class="button-primary" type="submit" name='save' value='<?php _e('Save Changes') ?>' />
     <input type="submit" name='reset' value='<?php _e('Reset') ?>' />
     </p>
     </form>
-    
+        
     <table class='wp_social_bookmarking_light_options'>
     <tr><th><?php _e("Service Code") ?></th><th><?php _e("Explain") ?></th></tr>
     <tr><td>hatena</td><td>Hatena Bookmark</td></tr>
     <tr><td>hatena_users</td><td>Hatena Bookmark Users</td></tr>
+    <tr><td>hatena_button</td><td>Hatena Bookmark Button</td></tr>
     <tr><td>twib</td><td>Twib - Twitter</td></tr>
     <tr><td>twib_users</td><td>Twib Users - Twitter</td></tr>
     <tr><td>tweetmeme</td><td>TweetMeme - Twitter</td></tr>
@@ -699,9 +928,8 @@ jQuery(document).ready(function(){
     <tr><td>gree</td><td>GREE Social Feedback</td></tr>
     </table>
 </div>
+
 <?php
 }
-
-
 
 ?>
