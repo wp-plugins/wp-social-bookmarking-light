@@ -5,7 +5,7 @@ Plugin URI: http://www.ninxit.com/blog/2010/06/13/wp-social-bookmarking-light/
 Description: This plugin inserts social share links at the top or bottom of each post.
 Author: utahta
 Author URI: http://www.ninxit.com/blog/
-Version: 1.6.0
+Version: 1.6.1
 */
 /*
 Copyright 2010 utahta (email : labs.ninxit@gmail.com)
@@ -69,6 +69,18 @@ class WpSocialBookmarkingLight
         return $this->link_raw( "<a href='{$url}' title='{$alt}' rel=nofollow class='wp_social_bookmarking_light_a' target=_blank>"
                                ."<img src='{$icon}' alt='{$alt}' title='{$alt}' $width $height class='wp_social_bookmarking_light_img' />"
                                ."</a>" );
+    }
+    
+    static function get_methods(){
+        $all_methods = get_class_methods("WpSocialBookmarkingLight");
+        $except_methods = array('WpSocialBookmarkingLight', 'to_utf8', 'link_raw', 'link', 'get_methods');
+        foreach($all_methods as $method){
+            if(in_array($method, $except_methods)){
+                continue;
+            }
+            $methods[] = $method;
+        }
+        return $methods;
     }
     
     /**
@@ -619,18 +631,19 @@ function wp_social_bookmarking_light_admin_head()
 
 <script type="text/javascript" charset="utf-8">
 //<![CDATA[
-function wsbl_options_toggle(service_id, is_simply)
+
+function wsbl_get_service_codes()
 {
     var val = jQuery("#services_id").val();
-    var vals = val.split(",");
-    var has_option = false;
-    for(var i = 0; i < vals.length; i++){
-        val = vals[i].replace(/(^\s+)|(\s+$)/g, "");
-        if(val == service_id){
-            has_option = true;
-        }
-    }
+    return jQuery.map(val.split(","), function(n, i){
+        return jQuery.trim(n);
+    });
+}
 
+function wsbl_options_toggle(service_id, is_simply)
+{
+    var has_option = jQuery.inArray(service_id, wsbl_get_service_codes()) >= 0;
+    
     var service_id_settings = "#" + service_id + "_settings";
     if(is_simply){
         has_option ? jQuery(service_id_settings).show() : jQuery(service_id_settings).hide();
@@ -648,17 +661,44 @@ function wsbl_options_toggle_all(is_simply)
     wsbl_options_toggle("facebook_like", is_simply);
 }
 
+function wsbl_check_service_code()
+{
+    var methods = <?php echo "\"".implode(',', WpSocialBookmarkingLight::get_methods())."\""?>;
+    methods = jQuery.map(methods.split(','), function(n, i){
+        return jQuery.trim(n);
+    });
+
+    var unknown_services = new Array();
+    jQuery.map(wsbl_get_service_codes(), function(n, i){
+        if(n.length > 0){
+            if(jQuery.inArray(n, methods) < 0){
+                unknown_services.push(n);
+            }
+        }
+    });
+    if(unknown_services.length > 0){
+        var error_str = "Unknown service code: [" + unknown_services.join(", ") + "]";
+        jQuery("#unknown_services_id").text(error_str).slideDown();
+    }
+    else{
+        jQuery("#unknown_services_id").slideUp();
+    }
+}
+
 // read onece
 jQuery(document).ready(function(){
-    jQuery("#tabs").tabs();
-
-    jQuery("#services_id").keyup(function(){
+    setInterval(function(){
         wsbl_options_toggle_all(false);
-    });
+    	wsbl_check_service_code();
+    }, 100);
+    
     wsbl_options_toggle_all(true);
+    wsbl_check_service_code();
+    jQuery("#tabs").tabs();
 });
 //]]>
 </script>
+
 <?php
 }
 
@@ -764,7 +804,10 @@ function wp_social_bookmarking_light_options_page()
             </tr>
             <tr>
             <th scope="row">Services: <br/> <span style="font-size:10px">(comma-separated)</span></th>
-            <td><input type="text" id='services_id' name='services' value="<?php echo $options['services'] ?>"size=120 style="font-size:12px !important" /></td>
+            <td>
+            	<input type="text" id='services_id' name='services' value="<?php echo $options['services'] ?>"size=120 style="font-size:12px !important" />
+            	<div id='unknown_services_id' style='color:red;'></div>
+            </td>
             </tr>
             </table>
         </div>
@@ -888,7 +931,7 @@ function wp_social_bookmarking_light_options_page()
     <input type="submit" name='reset' value='<?php _e('Reset') ?>' />
     </p>
     </form>
-        
+    
     <table class='wp_social_bookmarking_light_options'>
     <tr><th><?php _e("Service Code") ?></th><th><?php _e("Explain") ?></th></tr>
     <tr><td>hatena</td><td>Hatena Bookmark</td></tr>

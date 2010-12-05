@@ -4,7 +4,7 @@ Donate link: http://pledgie.com/campaigns/14051
 Tags: links, social, bookmarks, bookmarking, Hatena, Livedoor Clip, BuzzURL, @nifty clip, Twitter, Tumblr, FC2 Bookmark, newsing, Choix, Yahoo!JAPAN Bookmark, Yahoo!Buzz, Google Bookmark, Delicious, Digg, FriendFeed, Google Buzz, Facebook, reddit, LinkedIn, Evernote, Instapaper, StumbleUpon, mixi, gree
 Requires at least: 2.9.0
 Tested up to: 3.0.1
-Stable tag: 1.6.0
+Stable tag: 1.6.1
 
 This plugin inserts social share links at the top or bottom of each post.
 
@@ -54,6 +54,9 @@ This is the list of used social sites:
 
 == Changelog ==
 
+= 1.6.1 =
+* Added: Service code check function.
+
 = 1.6.0 =
 * Added: Hatena Bookmark Button.
 * Updated: admin setting page.
@@ -85,20 +88,16 @@ This is the list of used social sites:
 * Added Yahoo!Buzz, reddit, LinkedIn and TwitterButton. 
 
 = 1.2.0 =
-
 * Added "Is Page" option.
 * The name of the option was changed from "Single Page" to "Is Singular". 
 
 = 1.1.0 =
-
 * Bug fix: li style.
 * Added wp_social_bookmarking_light_output_e function. It can position the social-links manually inside your template.
 
 = 1.0.1 =
-
 * Bug fix: img style.
 
 = 1.0.0 =
-
 * First Release
 
