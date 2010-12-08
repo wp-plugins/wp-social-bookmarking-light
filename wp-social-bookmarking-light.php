@@ -71,18 +71,6 @@ class WpSocialBookmarkingLight
                                ."</a>" );
     }
     
-    static function get_methods(){
-        $all_methods = get_class_methods("WpSocialBookmarkingLight");
-        $except_methods = array('WpSocialBookmarkingLight', 'to_utf8', 'link_raw', 'link', 'get_methods');
-        foreach($all_methods as $method){
-            if(in_array($method, $except_methods)){
-                continue;
-            }
-            $methods[] = $method;
-        }
-        return $methods;
-    }
-    
     /**
      * @brief Hatena Bookmark
      */
@@ -465,6 +453,19 @@ class WpSocialBookmarkingLight
     
 }
 
+function wp_social_bookmarking_light_get_class_methods(){
+    $all_methods = get_class_methods('WpSocialBookmarkingLight');
+    $except_methods = array('WpSocialBookmarkingLight', 'to_utf8', 'link_raw', 'link', 'get_methods');
+    $methods = array();
+    foreach($all_methods as $method){
+        if(in_array($method, $except_methods)){
+            continue;
+        }
+        $methods[] = $method;
+    }
+    return $methods;
+}
+
 function wp_social_bookmarking_light_default_options()
 {
     return array( "services" => "hatena, hatena_users, facebook, google_buzz, yahoo, livedoor, friendfeed, tweetmeme",
@@ -663,7 +664,7 @@ function wsbl_options_toggle_all(is_simply)
 
 function wsbl_check_service_code()
 {
-    var methods = <?php echo "\"".implode(',', WpSocialBookmarkingLight::get_methods())."\""?>;
+    var methods = <?php echo "\"".implode(',', wp_social_bookmarking_light_get_class_methods())."\""?>;
     methods = jQuery.map(methods.split(','), function(n, i){
         return jQuery.trim(n);
     });
@@ -806,7 +807,7 @@ function wp_social_bookmarking_light_options_page()
             <th scope="row">Services: <br/> <span style="font-size:10px">(comma-separated)</span></th>
             <td>
             	<input type="text" id='services_id' name='services' value="<?php echo $options['services'] ?>"size=120 style="font-size:12px !important" />
-            	<div id='unknown_services_id' style='color:red;'></div>
+            	<div id='unknown_services_id' style='color:red'></div>
             </td>
             </tr>
             </table>
