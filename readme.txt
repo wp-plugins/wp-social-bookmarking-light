@@ -55,7 +55,7 @@ This is the list of used social sites:
 == Changelog ==
 
 = 1.6.2 =
-* Bug fixed: PHP Parser error. Thanks to milligramme and rik_wuts.
+* Bug fixed: Parser error on PHP4. Thanks to milligramme and rik_wuts.
 
 = 1.6.1 =
 * Added: Service code check function.
