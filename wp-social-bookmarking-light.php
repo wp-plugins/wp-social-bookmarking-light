@@ -5,7 +5,7 @@ Plugin URI: http://www.ninxit.com/blog/2010/06/13/wp-social-bookmarking-light/
 Description: This plugin inserts social share links at the top or bottom of each post.
 Author: utahta
 Author URI: http://www.ninxit.com/blog/
-Version: 1.6.1
+Version: 1.6.3
 */
 /*
 Copyright 2010 utahta (email : labs.ninxit@gmail.com)
@@ -61,14 +61,14 @@ class WpSocialBookmarkingLight
     }
     
     function link_raw( $url ){
-        return "<li>".$url."</li>";
+        return $url;
     }
     function link( $url, $alt, $icon, $width, $height ){
         $width = $width ? "width='$width'" : "";
         $height = $height ? "height='$height'" : "";
-        return $this->link_raw( "<a href='{$url}' title='{$alt}' rel=nofollow class='wp_social_bookmarking_light_a' target=_blank>"
-                               ."<img src='{$icon}' alt='{$alt}' title='{$alt}' $width $height class='wp_social_bookmarking_light_img' />"
-                               ."</a>" );
+        return "<a href='{$url}' title='{$alt}' rel=nofollow class='wp_social_bookmarking_light_a' target=_blank>"
+               ."<img src='{$icon}' alt='{$alt}' title='{$alt}' $width $height class='wp_social_bookmarking_light_img' />"
+               ."</a>";
     }
     
     /**
@@ -530,10 +530,9 @@ function wp_social_bookmarking_light_wp_head()
     
 ?>
 <style type="text/css">
-ul.wp_social_bookmarking_light{list-style:none !important;border:0 !important;padding:0;margin:0;}
-ul.wp_social_bookmarking_light li{float:left !important;border:0 !important;padding:0 4px 0 0 !important;margin:0 !important;height:20px !important;text-indent:0 !important;}
-#ul.wp_social_bookmarking_light li:before{content:"" !important;}
-ul.wp_social_bookmarking_light img{border:0 !important;padding:0;margin:0;vertical-align:top !important;}
+div.wp_social_bookmarking_light{border:0 !important;padding:0 !important;margin:0 !important;}
+div.wp_social_bookmarking_light div{float:left !important;border:0 !important;padding:0 4px 0 0 !important;margin:0 !important;height:20px !important;text-indent:0 !important;}
+div.wp_social_bookmarking_light img{border:0 !important;padding:0;margin:0;vertical-align:top !important;}
 .wp_social_bookmarking_light_clear{clear:both !important;}
 a.wp_social_bookmarking_light_instapaper {display: inline-block;font-family: 'Lucida Grande', Verdana, sans-serif;font-weight: bold;font-size: 11px;-webkit-border-radius: 8px;-moz-border-radius: 8px;color: #fff;background-color: #626262;border: 1px solid #626262;padding: 0px 3px 0px;text-shadow: #3b3b3b 1px 1px 0px;min-width: 62px;text-align: center;vertical-align:top;line-height:20px;}
 a.wp_social_bookmarking_light_instapaper, a.wp_social_bookmarking_light_instapaper:hover, a.wp_social_bookmarking_light_instapaper:active, a.wp_social_bookmarking_light_instapaper:visited {color: #fff; text-decoration: none; outline: none;}
@@ -544,17 +543,24 @@ a.wp_social_bookmarking_light_instapaper, a.wp_social_bookmarking_light_instapap
 
 function wp_social_bookmarking_light_output( $services )
 {
-    $wp = new WpSocialBookmarkingLight( get_permalink(), get_the_title(), get_bloginfo('name') );
-
+    $wp = new WpSocialBookmarkingLight( get_permalink(), get_the_title(), get_bloginfo('name') );    
+    $class_methods = wp_social_bookmarking_light_get_class_methods();
     $out = '';
     foreach( explode(",", $services) as $service ){
         $service = trim($service);
-        $out .= call_user_func( array( $wp, $service ) ); // call WpSocialBookmarkingLight method
+        if($service != ''){
+            if(in_array($service, $class_methods)){
+                $out .= '<div>'.call_user_func( array( $wp, $service ) ).'</div>'; // A WpSocialBookmarkingLight method is called.
+            }
+            else{
+                $out .= "<div>[`$service` not found]</div>";
+            }
+        }
     }
     if( $out == '' ){
         return $out;
     }
-    return "<ul class='wp_social_bookmarking_light'>{$out}</ul><br class='wp_social_bookmarking_light_clear' />";
+    return "<div class='wp_social_bookmarking_light'>{$out}</div><br class='wp_social_bookmarking_light_clear' />";
 }
 
 function wp_social_bookmarking_light_output_e( $services=null )
@@ -771,12 +777,12 @@ function wp_social_bookmarking_light_options_page()
             <li id='twitter_settings'><a href="#tabs-3"><span><?php _e("twitter") ?></span></a></li>
             <li id='hatena_button_settings'><a href="#tabs-4"><span><?php _e("hatena_button") ?></span></a></li>
             <li id='facebook_like_settings'><a href="#tabs-5"><span><?php _e("facebook_like") ?></span></a></li>
-            <li><a href="#tabs-10"><span><?php _e("Donation") ?></span></a></li>
+            <li><a href="#tabs-10"><span><?php _e("Donate", WP_SOCIAL_BOOKMARKING_LIGHT_DOMAIN) ?></span></a></li>
         </ul>
         <div id="tabs-1">
             <table class='form-table'>
             <tr>
-            <th scope="row">Position:</th>
+            <th scope="row"><?php _e('Position', WP_SOCIAL_BOOKMARKING_LIGHT_DOMAIN) ?>:</th>
             <td>
             <select name='position'>
             <option value='top' <?php if( $options['position'] == 'top' ) echo 'selected'; ?>>Top</option>
@@ -786,7 +792,7 @@ function wp_social_bookmarking_light_options_page()
             </td>
             </tr>
             <tr>
-            <th scope="row">Is Singular:</th>
+            <th scope="row"><?php _e('Singular', WP_SOCIAL_BOOKMARKING_LIGHT_DOMAIN) ?>:</th>
             <td>
             <select name='single_page'>
             <option value='true' <?php if( $options['single_page'] == true ) echo 'selected'; ?>>Enabled</option>
@@ -795,7 +801,7 @@ function wp_social_bookmarking_light_options_page()
             </td>
             </tr>
             <tr>
-            <th scope="row">Is Page:</th>
+            <th scope="row"><?php _e('Page', WP_SOCIAL_BOOKMARKING_LIGHT_DOMAIN) ?>:</th>
             <td>
             <select name='is_page'>
             <option value='true' <?php if( $options['is_page'] == true ) echo 'selected'; ?>>Enabled</option>
@@ -804,7 +810,7 @@ function wp_social_bookmarking_light_options_page()
             </td>
             </tr>
             <tr>
-            <th scope="row">Services: <br/> <span style="font-size:10px">(comma-separated)</span></th>
+            <th scope="row"><?php _e('Services', WP_SOCIAL_BOOKMARKING_LIGHT_DOMAIN) ?>: <br/> <span style="font-size:10px">(comma-separated)</span></th>
             <td>
             	<input type="text" id='services_id' name='services' value="<?php echo $options['services'] ?>"size=120 style="font-size:12px !important" />
             	<div id='unknown_services_id' style='color:red'></div>
@@ -923,7 +929,8 @@ function wp_social_bookmarking_light_options_page()
         </div>
         
         <div id="tabs-10">
-        	<p>A donation would help development of WP Social Bookmarking Light.</p>
+        	<p>Your donation will help the development of "WP Social Bookmarking Light".</p>
+        	<p>If you find it useful for you, feel free to lend your support.</p>
             <a href='http://www.pledgie.com/campaigns/14051' target=_blank><img alt='Click here to lend your support to: WP Social Bookmarking Light and make a donation at www.pledgie.com !' src='http://www.pledgie.com/campaigns/14051.png?skin_name=chrome' border='0' /></a>
         </div>
     </div>
@@ -934,7 +941,7 @@ function wp_social_bookmarking_light_options_page()
     </form>
     
     <table class='wp_social_bookmarking_light_options'>
-    <tr><th><?php _e("Service Code") ?></th><th><?php _e("Explain") ?></th></tr>
+    <tr><th><?php _e("Service Code", WP_SOCIAL_BOOKMARKING_LIGHT_DOMAIN) ?></th><th><?php _e("Explain", WP_SOCIAL_BOOKMARKING_LIGHT_DOMAIN) ?></th></tr>
     <tr><td>hatena</td><td>Hatena Bookmark</td></tr>
     <tr><td>hatena_users</td><td>Hatena Bookmark Users</td></tr>
     <tr><td>hatena_button</td><td>Hatena Bookmark Button</td></tr>
