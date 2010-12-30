@@ -5,7 +5,7 @@ Plugin URI: http://www.ninxit.com/blog/2010/06/13/wp-social-bookmarking-light/
 Description: This plugin inserts social share links at the top or bottom of each post.
 Author: utahta
 Author URI: http://www.ninxit.com/blog/
-Version: 1.6.3
+Version: 1.6.4
 */
 /*
 Copyright 2010 utahta (email : labs.ninxit@gmail.com)
@@ -541,9 +541,9 @@ a.wp_social_bookmarking_light_instapaper, a.wp_social_bookmarking_light_instapap
 <?php
 }
 
-function wp_social_bookmarking_light_output( $services )
+function wp_social_bookmarking_light_output( $services, $link, $title )
 {
-    $wp = new WpSocialBookmarkingLight( get_permalink(), get_the_title(), get_bloginfo('name') );    
+    $wp = new WpSocialBookmarkingLight( $link, $title, get_bloginfo('name') );
     $class_methods = wp_social_bookmarking_light_get_class_methods();
     $out = '';
     foreach( explode(",", $services) as $service ){
@@ -563,13 +563,13 @@ function wp_social_bookmarking_light_output( $services )
     return "<div class='wp_social_bookmarking_light'>{$out}</div><br class='wp_social_bookmarking_light_clear' />";
 }
 
-function wp_social_bookmarking_light_output_e( $services=null )
+function wp_social_bookmarking_light_output_e( $services=null, $link=null, $title=null )
 {
     if($services == null){
         $options = wp_social_bookmarking_light_options();
         $services = $options['services'];
     }
-    echo wp_social_bookmarking_light_output( $services );
+    echo wp_social_bookmarking_light_output( $services, $link, $title );
 }
 
 function wp_social_bookmarking_light_the_content( $content )
@@ -586,7 +586,7 @@ function wp_social_bookmarking_light_the_content( $content )
         return $content;
     }
 
-    $out = wp_social_bookmarking_light_output( $options['services'] );
+    $out = wp_social_bookmarking_light_output( $options['services'], get_permalink(), get_the_title() );
     if( $out == '' ){
        return $content;
     }
@@ -605,6 +605,8 @@ function wp_social_bookmarking_light_admin_print_scripts()
     wp_enqueue_script('jquery');
     wp_enqueue_script('jquery-ui-core');
     wp_enqueue_script('jquery-ui-tabs');
+    wp_enqueue_script('jquery-ui-sortable');
+    wp_enqueue_script('jquery-ui-draggable');
 }
 
 function wp_social_bookmarking_light_admin_print_styles()
@@ -616,23 +618,66 @@ function wp_social_bookmarking_light_admin_head()
 {
 ?>
 <style type="text/css">
-.wp_social_bookmarking_light_options{
+.wsbl_options{
     border: 1px solid #CCCCCC;
     background-color: #F8F8EB;
     vertical-align: top;
     margin: 0px 10px 10px 0px;
     padding: 0px;
 }
-.wp_social_bookmarking_light_options th{
+.wsbl_options th{
     background-color: #E8E8DB;
     text-align: center;
     margin: 0px;
     padding: 3px;
 }
-.wp_social_bookmarking_light_options td{en
+.wsbl_options td{en
     text-align: left;
     margin: 0px;
     padding: 3px;
+}
+
+#wsbl_sortable, #wsbl_draggable {
+	list-style-type: none;
+	margin: 0;
+	padding: 5px;
+	overflow: auto;
+	width: 160px;
+	height: 240px;
+	float: left;
+	border: 1px solid #999;
+	background-color: #FFF;
+}
+#wsbl_sortable li, #wsbl_draggable li{
+	width: 120px;
+	height: 20px;
+	font-size: 12px;
+	margin: 0px auto;
+	padding: 3px;
+	border: 1px solid #999;
+	background-color: #F8F8EB;
+	cursor: pointer;
+}
+.wsbl_sortable_highlight {
+	border: 1px dashed #333 !important;
+	background-color: transparent !important;
+}
+.wsbl_txt_draggable{
+	float:left;
+}
+.wsbl_img_draggable{
+	margin-left: auto;
+	margin-right: 0;
+	text-align: right;
+	display: none;
+}
+.wsbl_point_left{
+	float: left;
+	height : 240px ;
+	margin: 0 20px;
+}
+.wsbl_point_left img{
+	margin-top: 90px;
 }
 </style>
 
@@ -660,47 +705,68 @@ function wsbl_options_toggle(service_id, is_simply)
     }
 }
 
-function wsbl_options_toggle_all(is_simply)
+function wsbl_update_services(is_simply)
 {
+	var vals = "";
+	var service = jQuery("#wsbl_sortable .wsbl_txt_draggable");
+	service.each(function(){
+		vals += vals == "" ? "" : ",";
+		vals += jQuery(this).text();
+	});
+	jQuery("#services_id").val(vals);
+	
+	is_simply = is_simply || false;
     wsbl_options_toggle("mixi", is_simply);
     wsbl_options_toggle("twitter", is_simply);
     wsbl_options_toggle("hatena_button", is_simply);
     wsbl_options_toggle("facebook_like", is_simply);
 }
 
-function wsbl_check_service_code()
+function wsbl_update_sortable()
 {
-    var methods = <?php echo "\"".implode(',', wp_social_bookmarking_light_get_class_methods())."\""?>;
-    methods = jQuery.map(methods.split(','), function(n, i){
-        return jQuery.trim(n);
+	jQuery("#wsbl_sortable .wsbl_img_draggable").each(function(){
+		var button = jQuery(this);
+		button.css("display", "block"); // show delete button.
+    	var img = jQuery("img", button);
+    	img.mousedown(function(){
+    		var p = jQuery(this).parents("li");
+    		p.slideUp("fast", function(){
+    			p.remove();
+    			wsbl_update_services();
+    		});
+    	});
+    	img.attr('src', '<?php echo WP_SOCIAL_BOOKMARKING_LIGHT_IMAGES_URL."/close_button.png"?>');
+    	img.hover(
+        	function(){
+        		jQuery(this).attr('src', '<?php echo WP_SOCIAL_BOOKMARKING_LIGHT_IMAGES_URL."/close_button2.png"?>');
+        	},
+        	function(){
+        		jQuery(this).attr('src', '<?php echo WP_SOCIAL_BOOKMARKING_LIGHT_IMAGES_URL."/close_button.png"?>');
+        	}
+    	);
     });
-
-    var unknown_services = new Array();
-    jQuery.map(wsbl_get_service_codes(), function(n, i){
-        if(n.length > 0){
-            if(jQuery.inArray(n, methods) < 0){
-                unknown_services.push(n);
-            }
-        }
-    });
-    if(unknown_services.length > 0){
-        var error_str = "Unknown service code: [" + unknown_services.join(", ") + "]";
-        jQuery("#unknown_services_id").text(error_str).slideDown();
-    }
-    else{
-        jQuery("#unknown_services_id").slideUp();
-    }
 }
 
 // read onece
 jQuery(document).ready(function(){
-    setInterval(function(){
-        wsbl_options_toggle_all(false);
-    	wsbl_check_service_code();
-    }, 100);
+    jQuery("#wsbl_sortable").sortable({
+    	placeholder: "wsbl_sortable_highlight",
+    	update:function(e, ui){
+    		wsbl_update_sortable();
+    		wsbl_update_services();
+    	}
+    });
     
-    wsbl_options_toggle_all(true);
-    wsbl_check_service_code();
+    jQuery("#wsbl_draggable li").draggable({
+    	connectToSortable:"#wsbl_sortable",
+    	helper:'clone',
+    	revert:"invalid"
+    });
+    jQuery("#wsbl_draggable, #wsbl_sortable").disableSelection();
+
+	wsbl_update_sortable();
+    wsbl_update_services(true);
+	
     jQuery("#tabs").tabs();
 });
 //]]>
@@ -764,6 +830,7 @@ function wp_social_bookmarking_light_options_page()
     else{
         $options = wp_social_bookmarking_light_options();
     }
+    $class_methods = wp_social_bookmarking_light_get_class_methods();
 ?>
 
 <div class="wrap">
@@ -810,10 +877,40 @@ function wp_social_bookmarking_light_options_page()
             </td>
             </tr>
             <tr>
-            <th scope="row"><?php _e('Services', WP_SOCIAL_BOOKMARKING_LIGHT_DOMAIN) ?>: <br/> <span style="font-size:10px">(comma-separated)</span></th>
+            <th scope="row"><?php _e('Services', WP_SOCIAL_BOOKMARKING_LIGHT_DOMAIN) ?>: <br/> <span style="font-size:10px">(drag-and-drop)</span></th>
             <td>
-            	<input type="text" id='services_id' name='services' value="<?php echo $options['services'] ?>"size=120 style="font-size:12px !important" />
-            	<div id='unknown_services_id' style='color:red'></div>
+            	<input type="text" id='services_id' name='services' value="<?php echo $options['services'] ?>"size=120 style="font-size:12px;" onclick="this.select(0, this.value.length)" readonly/>
+            	<br />
+            	<br />
+            	<ul id="wsbl_sortable">
+            	<?php
+            	foreach( explode(",", $options['services']) as $service ){
+                    $service = trim($service);
+                    if($service != ''){
+                        if(in_array($service, $class_methods)){
+                            echo "<li>"
+                            	 ."<div class='wsbl_txt_draggable'>$service</div>"
+                            	 ."<div class='wsbl_img_draggable'><img src=''></div>"
+                            	 ."<br clear='both'>"
+                            	 ."</li>\n";
+                        }
+                    }
+            	}
+            	?>
+            	</ul>
+            	<div class="wsbl_point_left"><img src='<?php echo WP_SOCIAL_BOOKMARKING_LIGHT_IMAGES_URL."/point_left.png"?>'></div>
+            	<ul id="wsbl_draggable">
+            	<?php
+            	foreach($class_methods as $method){
+            	    echo "<li>"
+            	    	 ."<div class='wsbl_txt_draggable'>$method</div>"
+            	    	 ."<div class='wsbl_img_draggable'><img src=''></div>"
+            	    	 ."<br clear='both'>"
+            	    	 ."</li>\n";
+            	}
+            	?>
+            	</ul>
+            	<br clear="both"/>
             </td>
             </tr>
             </table>
@@ -940,7 +1037,7 @@ function wp_social_bookmarking_light_options_page()
     </p>
     </form>
     
-    <table class='wp_social_bookmarking_light_options'>
+    <table class='wsbl_options'>
     <tr><th><?php _e("Service Code", WP_SOCIAL_BOOKMARKING_LIGHT_DOMAIN) ?></th><th><?php _e("Explain", WP_SOCIAL_BOOKMARKING_LIGHT_DOMAIN) ?></th></tr>
     <tr><td>hatena</td><td>Hatena Bookmark</td></tr>
     <tr><td>hatena_users</td><td>Hatena Bookmark Users</td></tr>
