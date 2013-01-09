@@ -33,7 +33,7 @@ function wp_social_bookmarking_light_output( $services, $link, $title )
         $service = trim($service);
         if($service != ''){
             if(in_array($service, $class_methods)){
-                $out .= '<div>'.call_user_func( array( $wp, $service ) ).'</div>'; // A WpSocialBookmarkingLight method is called.
+                $out .= '<div class="wsbl_'.$service.'">'.call_user_func( array( $wp, $service ) ).'</div>'; // WpSocialBookmarkingLight method
             }
             else{
                 $out .= "<div>[`$service` not found]</div>";
@@ -92,22 +92,11 @@ function wp_social_bookmarking_light_wp_head()
         $locale = ($locale == '' ? 'en_US' : $locale);
         echo '<script type="text/javascript" src="http://connect.facebook.net/'.$locale.'/all.js#xfbml=1"></script>'."\n";
     }
-    // Google +1
-    if(in_array('google_plus_one', $services)){
-        $lang = $options['google_plus_one']['lang'];
-        echo '<script type="text/javascript" src="http://apis.google.com/js/plusone.js">{lang:\''.$lang.'\'}</script>'."\n";
-    }
 
     // css
-    $padding_top = $options['style']['padding_top'];
-    $padding_bottom = $options['style']['padding_bottom'];
-    $float = $options['style']['float'];
 ?>
 <style type="text/css">
-div.wp_social_bookmarking_light{border:0 !important;padding:<?php echo $padding_top ?>px 0 <?php echo $padding_bottom ?>px 0 !important;margin:0 !important;}
-div.wp_social_bookmarking_light div{float:<?php echo $float ?> !important;border:0 !important;padding:0 4px 0px 0 !important;margin:0 !important;height:21px !important;text-indent:0 !important;}
-div.wp_social_bookmarking_light img{border:0 !important;padding:0;margin:0;vertical-align:top !important;}
-.wp_social_bookmarking_light_clear{clear:both !important;}
+<?php echo $options['styles'] ?>
 </style>
 <!-- END: WP Social Bookmarking Light -->
 <?php
@@ -140,6 +129,9 @@ function wp_social_bookmarking_light_the_content( $content )
     else if( $options['position'] == 'bottom' ){
         return "{$content}{$out}";
     }
+    else if( $options['position'] == 'both'){
+        return "{$out}{$content}{$out}";
+    }
     return $content;
 }
 
@@ -162,13 +154,22 @@ function wp_social_bookmarking_light_wp_footer()
     if(in_array('evernote', $services)){
         echo '<script type="text/javascript" src="http://static.evernote.com/noteit.js"></script>'."\n";
     }
+    // Google +1
+    if(in_array('google_plus_one', $services)){
+        $lang = $options['google_plus_one']['lang'];
+?>
+<script type="text/javascript">
+  window.___gcfg = {lang: '<?php echo $lang ?>'};
 
-	if(in_array('grow', $services)){
-		$apikey = $options['grow']['apikey'];
-		if($apikey && !is_preview()){
-			echo '<script type="text/javascript" src="http://growbutton.com/javascripts/button.js?apikey=' . $apikey . '&shape=' . $options['grow']['button_type'] .'&insert=false"></script>';
-		}
-	}
+  (function() {
+    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+    po.src = 'https://apis.google.com/js/plusone.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+  })();
+</script>
+<?php
+    }
+    
 ?>
 <!-- END: WP Social Bookmarking Light -->
 <?php
