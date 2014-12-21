@@ -99,7 +99,7 @@ function wp_social_bookmarking_light_wp_head()
   var js, fjs = d.getElementsByTagName(s)[0];
   if (d.getElementById(id)) return;
   js = d.createElement(s); js.id = id;
-  js.src = "//connect.facebook.net/<?php echo $locale ?>/all.js#xfbml=1";
+  js.src = "//connect.facebook.net/<?php echo $locale ?>/sdk.js#xfbml=1&version=v2.0";
   fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk'));</script>   
 <?php
@@ -134,7 +134,7 @@ function wp_social_bookmarking_light_the_content( $content )
     
     $out = wp_social_bookmarking_light_output( $options['services'], get_permalink(), get_the_title() );
     if( $out == '' ){
-       return $content;
+        return $content;
     }
     if( $options['position'] == 'top' ){
         return "{$out}{$content}";
